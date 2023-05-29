@@ -15,7 +15,7 @@ const { authenticate, router } = require('../src/auth/auth')
 const cors = require('cors')
 
 app.get('/', (req, res)=> {
-    return res.status(200).json({
+    res.status(200).json({
         status: 200,
         headers: req.headers,
         body: "Hello world"
