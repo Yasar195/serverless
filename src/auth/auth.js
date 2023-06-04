@@ -115,6 +115,61 @@ router.get('/telecallers', (req, res)=> {
     })
 })
 
+router.get('/dash', (req, res)=> {
+    const result = new Promise((resolve, reject) => {
+        const data = {}
+        if(req.query.dep_id){
+            connection.query(`select count(*) from tour where dep_id=${req.query.dep_id};`, (err, tourres)=>{
+                if(err){
+                    reject()
+                }
+                data.tours = tourres.rows[0].count
+                connection.query(`select count(*) from customers where dep_id=${req.query.dep_id};`, (err, cusres)=> {
+                    if(err){
+                        reject()
+                    }
+                    data.customers = cusres.rows[0].count
+                    connection.query(`select count(*) from users where dep_id=${req.query.dep_id};`, (err, useres)=> {
+                        if(err){
+                            reject()
+                        }
+                        data.users = useres.rows[0].count
+                        connection.query(`select count(*) from leads where dep_id=${req.query.dep_id};`, (err, callres)=> {
+                            if(err){
+                                reject()
+                            }
+                            data.calls = callres.rows[0].count
+                            connection.query(`select count(*) from leads where dep_id=${req.query.dep_id} and follow_up=true;`, (err, folres)=> {
+                                if(err){
+                                    reject()
+                                }
+                                data.follow_ups = folres.rows[0].count
+                                resolve(data)
+                            })
+                        })
+                    })
+                })
+            })
+        }
+        else{
+            reject()
+        }
+    })
+    
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'fetching dash data failed',
+            success: false
+        })
+    })
+})
+
 module.exports = {
     authenticate,
     router
