@@ -30,45 +30,9 @@ const authenticate = async (req, res, next) => {
     })
 }
 
-const register = async (req, res, next) => {
-    const result = new Promise((resolve, reject)=> {
-        connection.query(`select count(*) from users where user_id='${res.locals.uid}';`, (err, result)=> {
-            if(err){
-                reject("getting user data failed")
-            }
-            resolve(result.rows)
-        })
-    })
-    result.then((data)=> {
-        if(data[0].count === "0"){
-            const insert = new Promise((resolve, reject) => {
-                connection.query(`insert into users (user_id, user_email) values('${res.locals.uid}', '${res.locals.email}');`, (err, result)=> {
-                    if(err){
-                        reject("getting user data failed")
-                    }
-                    resolve()
-                })
-            })
-            insert.then(()=>{
-                next()
-            })
-            .catch(()=> {
-                res.status(500).json({
-                    result: "server error",
-                    success: false
-                })
-            })
-        }
-    })
-    .catch((err)=> {
-        res.send("hello")
-    })
-    next()
-}
-
 // sign up route
 
-router.get('/', register, async (req, res) => {
+router.get('/', async (req, res) => {
     const user = new Promise((resolve, reject) => {
             connection.query(`select users.user_id, users.user_name, users.user_type, users.user_email, users.registered, users.dep_id, users.branch_id, departments.dep_name, departments.dep_image, branches.branch_name from users join departments on users.dep_id = departments.dep_id join branches on users.branch_id = branches.branch_id where users.user_id='${res.locals.uid}';`, (err, result)=> {
                 if(err){
