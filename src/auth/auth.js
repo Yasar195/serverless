@@ -34,12 +34,20 @@ const authenticate = async (req, res, next) => {
 
 router.get('/', async (req, res) => {
     const user = new Promise((resolve, reject) => {
-            connection.query(`select users.user_id, users.user_name, users.user_type, users.user_email, users.registered, users.dep_id, users.branch_id, departments.dep_name, departments.dep_image, branches.branch_name from users join departments on users.dep_id = departments.dep_id join branches on users.branch_id = branches.branch_id where users.user_id='${res.locals.uid}';`, (err, result)=> {
+        const now = new Date()
+        const date = now.toLocaleDateString()
+        const time = now.toLocaleTimeString()
+        connection.query(`select users.user_name, users.user_type, users.user_email, users.registered, users.dep_id, users.branch_id, departments.dep_name, departments.dep_image, branches.branch_name from users join departments on users.dep_id = departments.dep_id join branches on users.branch_id = branches.branch_id where users.user_id='${res.locals.uid}';`, (err, result)=> {
+            if(err){
+                reject()
+            }
+            connection.query(`insert into user_activity (user_id, activity, dep, time, date) values ('${res.locals.uid}', 'sign in', 'login', '${time}', '${date}');`, (err) => {
                 if(err){
                     reject()
                 }
                 resolve(result.rows)
             })
+        })
     })
     user.then(async (data)=> {
         const params = {
