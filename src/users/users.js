@@ -8,7 +8,6 @@ router.get('/', async (req, res)=> {
                 if(err){
                     reject("getting user data failed")
                 }
-                console.log(result)
                 resolve(result.rows)
             })
         }
