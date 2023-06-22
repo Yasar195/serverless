@@ -120,8 +120,8 @@ router.get('/activity', async (req, res)=> {
 router.post('/createtours', async (req, res)=> {
     const data = req.body;
     const result = new Promise((resolve, reject)=> {
-        if(data.dep_id&&data.tour_name&&data.tour_des){
-            connection.query(`insert into tour (dep_id, tour_name, tour_des) values (${data.dep_id}, '${data.tour_name}', '${data.tour_des}');`, (err)=> {
+        if(data.dep_id&&data.tour_name&&data.tour_des&&data.tour_code){
+            connection.query(`insert into tour (dep_id, tour_name, tour_des, tour_code) values (${data.dep_id}, '${data.tour_name}', '${data.tour_des}', '${data.tour_code}');`, (err)=> {
                 if(err){
                     reject()
                 }
