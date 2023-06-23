@@ -184,4 +184,33 @@ router.get('/:lead_id', (req, res) => {
     })
 })
 
+// router.get('/tour', (req, res)=> {
+//     const result = new Promise((resolve, reject) => {
+//         if(req.query.tour_code){
+//             connection.query(`select * from leads join customers on leads.customer_id=customers.customer_id where customers.tour_code, leads.lead_id=${req.params.lead_id} and leads.user_id='${res.locals.uid}';`, (err, response)=> {
+//                 if(err){
+//                     reject()
+//                 }
+//                 resolve(response.rows)
+//             })
+//         }
+//         else{
+//             reject()
+//         }
+//     })
+
+//     result.then((data)=> {
+//         res.status(200).json({
+//             result: data,
+//             success:true
+//         })
+//     })
+//     .catch(()=> {
+//         res.status(400).json({
+//             result: 'fetching lead failed',
+//             success: false
+//         })
+//     })
+// })
+
 module.exports = router;
