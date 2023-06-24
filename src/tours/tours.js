@@ -252,4 +252,39 @@ router.post('/createaddons', async (req, res)=> {
     })
 })
 
+router.get('/itinerary', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.tour_code){
+            connection.query(`select tour_pdf from tour where tour_code='${req.query.tour_code}';`, (err, response)=> {
+                if(err){
+                    reject()
+                }
+                resolve(response.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((data)=> {
+        const params = {
+            Bucket: 'fixeditinerary',
+            Key: data[0].tour_pdf,
+        };
+        const url = s3.getSignedUrl('getObject', params);
+        data[0].pdf_link = url;
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "fetching fixed itinerary failed",
+            success: false
+        })
+    })
+})
+
 module.exports = router;
