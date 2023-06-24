@@ -1,5 +1,7 @@
 const connection = require('../utils/Connect')
 const router = require('express').Router()
+const { generateRandomString } = require('../utils/utils')
+const s3 = require('../utils/aws')
 
 router.get('/', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
@@ -119,12 +121,25 @@ router.get('/activity', async (req, res)=> {
 
 router.post('/createtours', async (req, res)=> {
     const data = req.body;
+    const file = req.files.pdf;
     const result = new Promise((resolve, reject)=> {
-        if(data.dep_id&&data.tour_name&&data.tour_des&&data.tour_code){
-            connection.query(`insert into tour (dep_id, tour_name, tour_des, tour_code) values (${data.dep_id}, '${data.tour_name}', '${data.tour_des}', '${data.tour_code}');`, (err)=> {
-                if(err){
-                    reject()
+        if(file&&data.dep_id&&data.tour_name&&data.tour_des&&data.tour_code){
+            const key = `${data.tour_code}.pdf`
+            const params = {
+                Bucket: 'fixeditinerary',
+                Key: key,
+                Body: file.data,
+            };
+            s3.upload(params, function (err) {
+                if (err) {
+                  reject()
                 }
+                connection.query(`insert into tour (dep_id, tour_name, tour_des, tour_code, tour_pdf) values (${data.dep_id}, '${data.tour_name}', '${data.tour_des}', '${data.tour_code}', '${key}');`, (err)=> {
+                    if(err){
+                        reject()
+                    }
+                    resolve()
+                })
                 resolve()
             })
         }

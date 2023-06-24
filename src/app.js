@@ -10,6 +10,7 @@ const tours = require('./tours/tours');
 const pdf = require('./pdf/pdf');
 const audio = require('./audio/audio')
 const leaves = require('./leaves/leaves')
+const rooms = require('./rooms/rooms')
 const fileUpload = require('express-fileupload');
 const { authenticate, router } = require('../src/auth/auth')
 const cors = require('cors')
@@ -36,6 +37,7 @@ app.use('/tours', tours)
 app.use('/pdf', pdf)
 app.use('/audio', audio)
 app.use('/leaves', leaves)
+app.use('/rooms', rooms)
 
 
 

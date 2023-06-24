@@ -27,12 +27,12 @@ router.post('/upload', (req, res)=> {
             if (err) {
               reject()
             }
-            connection.query(`insert into customer_response (customer_id, response_text, response_key, call_date, user_id) values (${req.body.customer_id}, '${req.body.response}', '${key}', '${req.body.date}', '${res.locals.uid}');`, (err)=> {
+            connection.query(`insert into customer_response (customer_id, response_text, response_key, call_date, user_id) values (${data.customer_id}, '${data.response_text}', '${key}', '${data.date}', '${res.locals.uid}');`, (err)=> {
                 if(err){
                     reject()
                 }
                 if(data.follow_date){
-                    connection.query(`update leads set follow_up=true, follow_up_date='${data.follow_date}' where lead_id=${req.body.lead_id};`, (err)=>{
+                    connection.query(`update leads set follow_up=true, follow_up_date='${data.follow_date}' where lead_id=${data.lead_id};`, (err)=>{
                         if(err){
                             reject()
                         }
