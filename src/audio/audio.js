@@ -74,7 +74,7 @@ router.post('/upload', (req, res)=> {
 router.get('/:id', (req, res)=> {
     const audios = new Promise((resolve, reject)=> {
         if(req.params.id){
-            connection.query(`select * from customer_response where customer_id=${req.params.id};`, (err, result)=> {
+            connection.query(`select * from customer_response join users on customer_response.user_id = users.user_id where customer_response.customer_id=${req.params.id};`, (err, result)=> {
                 if(err){
                     reject()
                 }
