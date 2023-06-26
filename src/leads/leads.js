@@ -130,11 +130,12 @@ router.get('/getanalytics', async (req, res)=> {
                     reject()
                 }
                 data.follow_ups = parseInt(response.rows[0].count)
-                connection.query(`select points from users where user_id='${res.locals.uid}';`, (err, poires)=> {
+                connection.query(`select points, target_points from users where user_id='${res.locals.uid}';`, (err, poires)=> {
                     if(err){
                         reject()
                     }
                     data.points = poires.rows[0].points
+                    data.target_points = parseInt(poires.rows[0].target_points)
                     resolve(data)
                 })
             })
