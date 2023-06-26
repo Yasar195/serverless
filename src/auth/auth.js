@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
     const user = new Promise((resolve, reject) => {
         const now = new Date()
         const date = now.toLocaleDateString()
-        connection.query(`select users.user_id, users.user_name, users.user_type, users.user_email, users.registered, users.dep_id, users.branch_id, departments.dep_name, departments.dep_image, branches.branch_name from users join departments on users.dep_id = departments.dep_id join branches on users.branch_id = branches.branch_id where users.user_id='${res.locals.uid}';`, (err, result)=> {
+        connection.query(`select users.user_id, users.user_name, users.profile_key, users.user_type, users.user_email, users.registered, users.dep_id, users.branch_id, departments.dep_name, departments.dep_image, branches.branch_name from users join departments on users.dep_id = departments.dep_id join branches on users.branch_id = branches.branch_id where users.user_id='${res.locals.uid}';`, (err, result)=> {
             if(err){
                 reject()
             }
@@ -49,13 +49,18 @@ router.get('/', async (req, res) => {
         })
     })
     user.then(async (data)=> {
-        const params = {
+        const depurl = s3.getSignedUrl('getObject', {
             Bucket: 'trippens',
             Key: data[0].dep_image,
-            Expires: 60 * 60 // URL expires after 1 hour
-        };
-        const url = s3.getSignedUrl('getObject', params);
-        data[0].dep_image = url
+            Expires: 60 * 60
+        });
+        const prourl = s3.getSignedUrl('getObject', {
+            Bucket: 'triprofilephotos',
+            Key: data[0].profile_key,
+            Expires: 60 * 60
+        });
+        data[0].dep_image = depurl
+        data[0].profile_image = prourl
         res.status(200).json({
             result: data,
             success: true

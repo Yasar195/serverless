@@ -1,5 +1,6 @@
 const connection = require('../utils/Connect')
 const router = require('express').Router()
+const s3 = require('../utils/aws')
 
 router.get('/', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
@@ -75,13 +76,26 @@ router.post('/', async (req, res)=> {
 
 router.post('/signup', (req, res)=> {
     const data = req.body
+    const key = `${req.body.user_id}.jpg`
+    const image = req.files.image
+    const params = {
+        Bucket: 'triprofilephotos',
+        Key: key,
+        Body: image.data,
+    };
     const user = new Promise((resolve, reject) => {
-        if(data.user_name&&data.user_id&&data.user_type&&data.user_email&&data.dep_id&&data.branch_id && data.phone){
-            connection.query(`insert into users (user_id, user_name, user_type, user_email, dep_id, branch_id, registered, user_phone) values('${data.user_id}', '${data.user_name}', '${data.user_type}', '${data.user_email}', ${data.dep_id}, ${data.branch_id}, true, '${data.phone}');`,(err, response)=> {
-                if(err){
+        if(image&&data.user_name&&data.user_id&&data.user_type&&data.user_email&&data.dep_id&&data.branch_id && data.phone && key){
+            s3.upload(params, function (err) {
+                if (err) {
                     reject()
                 }
-                resolve()
+                connection.query(`insert into users (user_id, user_name, user_type, user_email, dep_id, branch_id, registered, user_phone, profile_key) values('${data.user_id}', '${data.user_name}', '${data.user_type}', '${data.user_email}', ${data.dep_id}, ${data.branch_id}, true, '${data.phone}', '${key}');`,(err)=> {
+                    if(err){
+                        console.log(err)
+                        reject()
+                    }
+                    resolve()
+                })
             })
         }
         else{
