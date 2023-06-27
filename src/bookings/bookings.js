@@ -9,7 +9,6 @@ router.post('/', (req, res)=> {
     const now = new Date()
     const date = now.toLocaleDateString()
     const key = `${generateRandomString(10)}.pdf`
-    console.log(key)
     const params = {
         Bucket: 'travelitinerary',
         Key: key,
@@ -48,6 +47,44 @@ router.post('/', (req, res)=> {
     .catch(()=> {
         res.status(500).json({
             result: "booking failed",
+            success: false
+        })
+    })
+})
+
+router.get('/', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.dep_id){
+            connection.query(`select users.user_name, bookings.booking_date, customers.customer_name, bookings.amount_paid, bookings.amount_payable, bookings.travel_itinerary from bookings join users on bookings.user_id=users.user_id join customers on bookings.customer_id=customers.customer_id where bookings.dep_id=${req.query.dep_id};`, (err, response)=> {
+                if(err){
+                    reject()
+                }
+                resolve(response.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((data)=> {
+        data.forEach(booking => {
+            const url = s3.getSignedUrl('getObject', {
+                Bucket: 'travelitinerary',
+                Key: booking.travel_itinerary,
+                Expires: 60 * 60
+            });
+            booking.travel_itinerary = url
+        })
+        
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "fetching bookings failed",
             success: false
         })
     })

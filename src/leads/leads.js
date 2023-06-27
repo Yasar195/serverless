@@ -136,7 +136,13 @@ router.get('/getanalytics', async (req, res)=> {
                     }
                     data.points = poires.rows[0].points
                     data.target_points = parseInt(poires.rows[0].target_points)
-                    resolve(data)
+                    connection.query(`select count(*) from bookings where user_id='${res.locals.uid}';`, (err, boores)=> {
+                        if(err){
+                            reject()
+                        }
+                        data.bookings = parseInt(boores.rows[0].count)
+                        resolve(data)
+                    })
                 })
             })
         })
