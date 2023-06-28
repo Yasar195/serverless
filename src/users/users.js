@@ -120,7 +120,7 @@ router.post('/signup', (req, res)=> {
 router.get('/freshleads', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id){
-            connection.query(`select * from customers where assigned=false and customer_progress='Not started' and dep_id=${req.query.dep_id} and booked=false ${req.query.name? `and customer_name like '%${req.query.name}%'`: ''};`, (err, response) => {
+            connection.query(`select * from customers where assigned=false and customer_progress='Not started'and customer_progress!='Booked' and dep_id=${req.query.dep_id} and booked=false ${req.query.name? `and customer_name like '%${req.query.name}%'`: ''};`, (err, response) => {
                 if(err){
                     reject()
                 }
@@ -149,7 +149,7 @@ router.get('/freshleads', async (req, res)=> {
 router.get('/oldleads', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id){
-            connection.query(`select * from customers where assigned=false and customer_progress!='Not started' and dep_id=${req.query.dep_id} and booked=false ${req.query.name? `and customer_name like '%${req.query.name}%'`: ''};`, (err, response) => {
+            connection.query(`select * from customers where assigned=false and customer_progress!='Not started' and customer_progress!='Booked' and dep_id=${req.query.dep_id} and booked=false ${req.query.name? `and customer_name like '%${req.query.name}%'`: ''};`, (err, response) => {
                 if(err){
                     reject()
                 }
