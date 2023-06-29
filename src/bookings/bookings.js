@@ -91,4 +91,34 @@ router.get('/', (req, res)=> {
 })
 
 
+router.put('/', (req, res)=> {
+    const data = req.body;
+    const result = new Promise((resolve, reject)=> {
+        if(data.booking_id && data.amount){
+            connection.query(`update bookings set amount_paid=${data.amount} where booking_id=${data.booking_id};`, (err)=> {
+                if(err){
+                    reject()
+                }
+                resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {  
+        res.status(200).json({
+            result: 'booking updated successfully',
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "booking updation failed",
+            success: false
+        })
+    })
+})
+
 module.exports = router
