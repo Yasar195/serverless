@@ -61,6 +61,36 @@ router.post('/', async (req, res)=> {
     })
 })
 
+router.put('/', async (req, res)=> {
+    const customer = req.body
+    const upload = new Promise((resolve, reject)=> {
+        if(customer.customer_id&&customer.customer_name && customer.customer_phone && customer.customer_vehicle && customer.customer_whatapp && customer.customer_progress && customer.customer_source && customer.customer_address && customer.customer_city && customer.customer_remarks &&  customer.customer_pax && customer.customer_category && customer.tour_code){
+            connection.query(`update customers set customer_name='${customer.customer_name}', customer_phone='${customer.customer_phone}', customer_vehicle='${customer.customer_vehicle}', customer_whatsapp='${customer.customer_whatapp}', customer_progress='${customer.customer_progress}', customer_source='${customer.customer_source}', customer_address='${customer.customer_address}', customer_city='${customer.customer_city}', customer_remarks='${customer.customer_remarks}', customer_pax='${customer.customer_pax}', customer_category='${customer.customer_category}', tour_code='${customer.tour_code}' where customer_id=${customer.customer_id};`, (err)=> {
+                if(err){
+                    reject()
+                }
+                resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    upload.then(()=> {
+        res.status(200).json({
+            result: "user data update success",
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "user data update failed",
+            success: false
+        })
+    })
+})
+
 router.post('/signup', (req, res)=> {
     const data = req.body
     const key = `${req.body.user_id}.jpg`
