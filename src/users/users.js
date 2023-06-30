@@ -5,7 +5,7 @@ const s3 = require('../utils/aws')
 router.get('/', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id){
-            connection.query(`SELECT * FROM customers JOIN users ON customers.user_id = users.user_id JOIN departments ON customers.dep_id = departments.dep_id JOIN branches ON customers.branch_id = branches.branch_id where customers.dep_id=${req.query.dep_id};`, (err, result)=> {
+            connection.query(`SELECT * FROM customers JOIN users ON customers.user_id = users.user_id JOIN departments ON customers.dep_id = departments.dep_id JOIN branches ON customers.branch_id = branches.branch_id where customers.dep_id=${req.query.dep_id} ${req.query.name? `and customer_name like %`+req.query.name+'%': ''};`, (err, result)=> {
                 if(err){
                     reject()
                 }
