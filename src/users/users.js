@@ -4,29 +4,16 @@ const s3 = require('../utils/aws')
 
 router.get('/', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
-        if(req.query.dep_id && req.query.branch_id){
-            connection.query(`SELECT customers.customer_id, customers.customer_name, customers.customer_phone, customers.customer_whatsapp, customers.customer_vehicle, customers.customer_progress, customers.customer_pax, customers.customer_address, customers.customer_category, customers.customer_remarks, customers.customer_city, users.user_name, users.user_email, users.user_type, departments.dep_name, branches.branch_name FROM customers JOIN users ON customers.user_id = users.user_id JOIN departments ON customers.dep_id = departments.dep_id JOIN branches ON customers.branch_id = branches.branch_id where customers.dep_id=${req.query.dep_id} and customers.branch_id=${req.query.branch_id};`, (err, result)=> {
-                if(err){
-                    reject("getting user data failed")
-                }
-                resolve(result.rows)
-            })
-        }
-        else if(req.query.dep_id){
-            connection.query(`SELECT customers.customer_id, customers.customer_name, customers.customer_phone, customers.customer_whatsapp, customers.customer_vehicle, customers.customer_progress, customers.customer_pax, customers.customer_address, customers.customer_category, customers.customer_remarks, customers.customer_city, users.user_name, users.user_email, users.user_type, departments.dep_name, branches.branch_name FROM customers JOIN users ON customers.user_id = users.user_id JOIN departments ON customers.dep_id = departments.dep_id JOIN branches ON customers.branch_id = branches.branch_id where customers.dep_id=${req.query.dep_id} ${req.query.name? `and customer_name like '%${req.query.name}%'`:''} ${req.query.progress?`and customer_progress='${req.query.progress}'`: ''};`, (err, result)=> {
-                if(err){
-                    reject("getting user data failed")
-                }
-                resolve(result.rows)
-            })
-        }
-        else{
-            connection.query(`SELECT * FROM customers;`, (err, result)=> {
+        if(req.query.dep_id){
+            connection.query(`SELECT * FROM customers where dep_id=${req.query.dep_id};`, (err, result)=> {
                 if(err){
                     reject()
                 }
                 resolve(result.rows)
             })
+        }
+        else {
+            reject()
         }
     })
 
