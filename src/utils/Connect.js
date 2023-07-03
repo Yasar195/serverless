@@ -4,7 +4,6 @@ require('dotenv').config()
 let client = null;
 
 let p = new Promise((resolve, reject) => {
-    console.log();
     client = new Client({
         user: process.env.DATABASE_USER,
         password: process.env.DATABASE_PASSWORD,
@@ -17,7 +16,7 @@ let p = new Promise((resolve, reject) => {
         resolve(client);
     }
     else{
-        reject('Connection failed');
+        reject();
     }
 })
 
