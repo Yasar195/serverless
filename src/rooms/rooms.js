@@ -60,4 +60,81 @@ router.get('/', (req, res)=> {
     })
 })
 
+router.post('/booking', (req, res)=> {
+    const data = req.body
+    const result = new Promise((resolve, reject)=> {
+        if(data.room_id&&data.start_date&&data.end_date){
+            connection.query(`insert into room_bookings (room_id, start_date, end_date) values (${data.room_id}, '${data.start_date}', '${data.end_date}');`, (err)=> {
+                if(err){
+                    reject()
+                }
+                resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+    
+    result.then(()=> {
+        res.status(200).json({
+            result: 'room booked successfully',
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'room booking failed',
+            success: false
+        })
+    })
+})
+
+router.post('/available', (req, res)=> {
+    const data = req.body
+    const result = new Promise((resolve, reject)=> {
+        if(data.tour_id&&data.start_date&&data.end_date){
+            connection.query(`select * from rooms where tour_id=${data.tour_id};`, (err, result)=> {
+                if(err){
+                    reject()
+                }
+                result.rows.forEach((row)=> {
+                    connection.query(`select * from room_bookings where room_id=${row.room_id};`, (err, indres)=> {
+                        if(err){
+                            reject()
+                        }
+                        indres.rows.forEach((booking)=> {
+                            console.log(booking.end_date)
+                            const booked = String(booking.end_date)
+                            console.log(booked)
+                            console.log(data.start_date)
+                            if(data.start_date<=booking.end_date){
+                                console.log('i executed')
+                                result.rows.splice(1, row)
+                            }
+                        })
+                    })
+                })
+                resolve(result.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+    
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'available room fetch failed',
+            success: false
+        })
+    })
+})
+
 module.exports = router
