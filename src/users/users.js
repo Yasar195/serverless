@@ -197,6 +197,7 @@ router.get('/booked', (req, res)=> {
         if(req.query.dep_id){
             connection.query(`select users.user_name, customers.customer_name, customers.tour_code, users.user_id, users.points, customers.customer_id from customers join users on customers.user_id=users.user_id where customers.customer_progress='Booked' and customers.booked=false and customers.dep_id=${req.query.dep_id};`, (err, response)=> {
                 if(err){
+                    console.log(err)
                     reject()
                 }
                 resolve(response.rows)

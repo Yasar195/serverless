@@ -8,6 +8,7 @@ router.get('/', async (req, res)=> {
         if(req.query.dep_id){
             connection.query(`select * from tour where dep_id=${req.query.dep_id};`, (err, response)=> {
                 if(err){
+                    console.log(err)
                     reject()
                 }
                 resolve(response.rows)

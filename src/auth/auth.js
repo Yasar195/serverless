@@ -38,10 +38,12 @@ router.get('/', async (req, res) => {
         const date = now.toLocaleDateString()
         connection.query(`select users.user_id, users.user_name, users.profile_key, users.user_type, users.user_email, users.registered, users.dep_id, users.branch_id, departments.dep_name, departments.dep_image, branches.branch_name from users join departments on users.dep_id = departments.dep_id join branches on users.branch_id = branches.branch_id where users.user_id='${res.locals.uid}';`, (err, result)=> {
             if(err){
+                console.log(err)
                 reject()
             }
             connection.query(`insert into user_activity (user_id, activity, dep, date) values ('${res.locals.uid}', 'sign in', 'login', '${date}');`, (err) => {
                 if(err){
+                    console.log(err)
                     reject()
                 }
                 resolve(result.rows)
@@ -76,6 +78,7 @@ router.get('/', async (req, res) => {
 
 router.get('/admins', async (req, res)=> {
     const user = new Promise((resolve, reject) => {
+        console.log(res.locals.uid)
         connection.query(`select * from admins where admin_id='${res.locals.uid}';`, (err, result)=> {
             if(err){
                 reject()
