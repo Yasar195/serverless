@@ -11,6 +11,7 @@ const pdf = require('./pdf/pdf');
 const audio = require('./audio/audio')
 const leaves = require('./leaves/leaves')
 const rooms = require('./rooms/rooms')
+const vehicles = require('./vehicles/vehicles')
 const bookings = require('./bookings/bookings')
 const fileUpload = require('express-fileupload');
 const { authenticate, router } = require('../src/auth/auth')
@@ -39,6 +40,7 @@ app.use('/pdf', pdf)
 app.use('/audio', audio)
 app.use('/leaves', leaves)
 app.use('/rooms', rooms)
+app.use('/vehicles', vehicles)
 app.use('/bookings', bookings)
 
 

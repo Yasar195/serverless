@@ -4,8 +4,8 @@ const router = require('express').Router()
 router.post('/', (req, res)=> {
     const data = req.body
     const result = new Promise((resolve, reject)=> {
-        if(data.tour_id&&data.room_number&&data.room_building&&data.room_price&&data.room_category){
-            connection.query(`insert into rooms (tour_id, room_number, room_building, room_price, room_category) values (${data.tour_id}, ${data.room_number}, '${data.room_building}', ${data.room_price}, '${data.room_category}');`, (err)=> {
+        if(data.tour_id&&data.vehicle_name&&data.vehicle_price&&data.vehicle_category){
+            connection.query(`insert into vehicles (tour_id, vehicle_name, vehicle_price, vehicle_category) values (${data.tour_id}, '${data.vehicle_name}', ${data.vehicle_price}, '${data.vehicle_category}');`, (err)=> {
                 if(err){
                     reject()
                 }
@@ -19,13 +19,13 @@ router.post('/', (req, res)=> {
     
     result.then(()=> {
         res.status(200).json({
-            result: 'room created successfully',
+            result: 'vehicle created successfully',
             success: true
         })
     })
     .catch(()=> {
         res.status(500).json({
-            result: 'creating room failed',
+            result: 'creating vehicle failed',
             success: false
         })
     })
@@ -34,7 +34,7 @@ router.post('/', (req, res)=> {
 router.get('/', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.tour_id){
-            connection.query(`select * from rooms where tour_id=${req.query.tour_id};`, (err, result)=> {
+            connection.query(`select * from vehicles where tour_id=${req.query.tour_id};`, (err, result)=> {
                 if(err){
                     reject()
                 }
@@ -54,7 +54,7 @@ router.get('/', (req, res)=> {
     })
     .catch(()=> {
         res.status(500).json({
-            result: 'fetching rooms failed',
+            result: 'fetching vehicles failed',
             success: false
         })
     })
@@ -63,8 +63,8 @@ router.get('/', (req, res)=> {
 router.post('/booking', (req, res)=> {
     const data = req.body
     const result = new Promise((resolve, reject)=> {
-        if(data.room_id&&data.start_date&&data.end_date){
-            connection.query(`insert into room_bookings (room_id, start_date, end_date) values (${data.room_id}, '${data.start_date}', '${data.end_date}');`, (err)=> {
+        if(data.vehicle_id&&data.start_date&&data.end_date){
+            connection.query(`insert into vehicle_bookings (vehicle_id, start_date, end_date) values (${data.vehicle_id}, '${data.start_date}', '${data.end_date}');`, (err)=> {
                 if(err){
                     reject()
                 }
@@ -78,13 +78,13 @@ router.post('/booking', (req, res)=> {
     
     result.then(()=> {
         res.status(200).json({
-            result: 'room booked successfully',
+            result: 'vehicle booked successfully',
             success: true
         })
     })
     .catch(()=> {
         res.status(500).json({
-            result: 'room booking failed',
+            result: 'vehicle booking failed',
             success: false
         })
     })
@@ -95,16 +95,16 @@ router.post('/available', (req, res)=> {
     const start_date = data.start_date
     const result = new Promise((resolve, reject)=> {
         const res = {}
-        if(data.tour_id&&data.start_date&&data.end_date&&data.room_category){
-            connection.query(`select * from rooms where tour_id=${data.tour_id} and room_category='${data.room_category}';`, (err, result)=> {
+        if(data.tour_id&&data.start_date&&data.end_date&&data.vehicle_category){
+            connection.query(`select * from vehicles where tour_id=${data.tour_id} and vehicle_category='${data.vehicle_category}';`, (err, result)=> {
                 if(err){
                     reject()
                 }
-                res.rooms = result.rows
+                res.vehicles = result.rows
                 res.bookings = []
-                if(res.rooms.length != 0){
+                if(res.vehicles.length != 0){
                     result.rows.forEach((row, index)=> {
-                        connection.query(`select * from room_bookings where room_id=${row.room_id};`, (err, indres)=> {
+                        connection.query(`select * from vehicle_bookings where vehicle_id=${row.vehicle_id};`, (err, indres)=> {
                             if(err){
                                 reject()
                             }
@@ -127,9 +127,9 @@ router.post('/available', (req, res)=> {
     
     result.then((result)=> {
         let data
-        if(result.rooms.length !== 0){
-            data = result.rooms
-            result.rooms.forEach((room, index)=> {
+        if(result.vehicles.length !== 0){
+            data = result.vehicles
+            result.vehicles.forEach((room, index)=> {
                 result.bookings[index].forEach(booking => {
                     const date = new Date(start_date)
                     if(date<=booking.end_date){
@@ -150,7 +150,7 @@ router.post('/available', (req, res)=> {
     .catch((err)=> {
         console.log(err)
         res.status(500).json({
-            result: 'available room fetch failed',
+            result: 'available vehicle fetch failed',
             success: false
         })
     })
