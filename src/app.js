@@ -13,6 +13,7 @@ const leaves = require('./leaves/leaves')
 const rooms = require('./rooms/rooms')
 const vehicles = require('./vehicles/vehicles')
 const bookings = require('./bookings/bookings')
+const progress = require('./progress/progress')
 const fileUpload = require('express-fileupload');
 const { authenticate, router } = require('../src/auth/auth')
 const cors = require('cors')
@@ -42,6 +43,7 @@ app.use('/leaves', leaves)
 app.use('/rooms', rooms)
 app.use('/vehicles', vehicles)
 app.use('/bookings', bookings)
+app.use('/progress', progress)
 
 
 module.exports = app
