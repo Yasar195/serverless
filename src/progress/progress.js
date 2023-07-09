@@ -4,7 +4,7 @@ const router = require('express').Router()
 router.get('/', (req, res)=> {
     const result = new Promise((resolve, reject) => {
         if(req.query.booking_id){
-            connection.query(`select * from progress join users on progress.user_id=users.user_id where progress.booking_id=${req.query.booking_id};`, (err, response)=> {
+            connection.query(`select * from progress join users on progress.user_id=users.user_id where progress.booking_id=${req.query.booking_id} order by progress_id desc;`, (err, response)=> {
                 if(err){
                     reject()
                 }
