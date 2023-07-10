@@ -221,16 +221,18 @@ router.get('/individual', (req, res)=> {
     })
 })
 
-router.delete('/individual', (req, res)=> {
+router.put('/individual', (req, res)=> {
     const data = req.body;
     const result = new Promise((resolve, reject) => {
         if(data.lead_id&&data.customer_id&&data.progress){
             connection.query(`update customers set assigned=false, customer_progress='${data.progress}' where customer_id=${data.customer_id};`, (err)=> {
                 if(err){
+                    console.log(err)
                     reject()
                 }
                 connection.query(`delete from leads where lead_id=${data.lead_id};`, (err)=> {
                     if(err){
+                        console.log(err)
                         reject()
                     }
                     resolve()
