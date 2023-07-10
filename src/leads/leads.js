@@ -48,8 +48,9 @@ router.post('/', async (req, res) => {
 router.get('/dash/followup', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id){
-            connection.query(`select users.user_name, leads.follow_up_date, customers.customer_name from leads join users on leads.user_id = users.user_id join customers on leads.customer_id = customers.customer_id where leads.dep_id=${req.query.dep_id} and leads.follow_up=true;`, (err, result)=> {
+            connection.query(`select users.user_name, leads.follow_up_date, customers.customer_name from leads join users on leads.user_id = users.user_id join customers on leads.customer_id = customers.customer_id where leads.dep_id=${req.query.dep_id} and leads.follow_up=true limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, result)=> {
                 if(err){
+                    console.log(err)
                     reject()
                 }
                 resolve(result.rows)

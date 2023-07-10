@@ -30,7 +30,7 @@ router.post('/', async (req, res) => {
 
 router.get('/mystatus', (req, res) => {
     const result = new Promise((resolve, reject) => {
-        connection.query(`select * from leave_request where user_id='${res.locals.uid}';`, (err, response)=> {
+        connection.query(`select * from leave_request where user_id='${res.locals.uid}' order by leave_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
             err ? reject(): resolve(response.rows)
         })
     })
