@@ -192,6 +192,70 @@ router.get('/tour', (req, res)=> {
     })
 })
 
+router.get('/individual', (req, res)=> {
+    const result = new Promise((resolve, reject) => {
+        if(req.query.user_id){
+            connection.query(`select * from leads join customers on leads.customer_id=customers.customer_id where leads.user_id='${req.query.user_id}';`, (err, response)=> {
+                if(err){
+                    reject()
+                }
+                resolve(response.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success:true
+        })
+    })
+    .catch(()=> {
+        res.status(400).json({
+            result: 'fetching leads failed',
+            success: false
+        })
+    })
+})
+
+router.delete('/individual', (req, res)=> {
+    const data = req.body;
+    const result = new Promise((resolve, reject) => {
+        if(data.lead_id&&data.customer_id&&data.progress){
+            connection.query(`update customers set assigned=false, customer_progress='${data.progress}' where customer_id=${data.customer_id};`, (err)=> {
+                if(err){
+                    reject()
+                }
+                connection.query(`delete from leads where lead_id=${data.lead_id};`, (err)=> {
+                    if(err){
+                        reject()
+                    }
+                    resolve()
+                })
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: "lead deletion successfull",
+            success:true
+        })
+    })
+    .catch(()=> {
+        res.status(400).json({
+            result: 'lead deletion failed',
+            success: false
+        })
+    })
+})
+
 router.get('/:lead_id', (req, res) => {
     const result = new Promise((resolve, reject) => {
         if(req.params.lead_id){
