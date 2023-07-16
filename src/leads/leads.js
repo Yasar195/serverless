@@ -195,7 +195,7 @@ router.get('/tour', (req, res)=> {
 router.get('/individual', (req, res)=> {
     const result = new Promise((resolve, reject) => {
         if(req.query.user_id){
-            connection.query(`select * from leads join customers on leads.customer_id=customers.customer_id where leads.user_id='${req.query.user_id}';`, (err, response)=> {
+            connection.query(`select * from leads join customers on leads.customer_id=customers.customer_id where leads.user_id='${req.query.user_id}' ${req.query.name? `and customers.customer_name like '%${req.query.name}%'`: ''} ${req.query.id? `and customers.customer_id=${req.query.id}`: ''} ${req.query.phone? `and customers.customer_phone like '%${req.query.phone}%'`: ''};`, (err, response)=> {
                 if(err){
                     reject()
                 }

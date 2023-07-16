@@ -90,6 +90,44 @@ router.get('/', (req, res)=> {
     })
 })
 
+router.get('/staff', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.user_id){
+            connection.query(`select bookings.booking_id, users.user_name, bookings.booking_date, customers.customer_name, bookings.amount_paid, bookings.amount_payable, bookings.travel_itinerary from bookings join users on bookings.user_id=users.user_id join customers on bookings.customer_id=customers.customer_id where bookings.user_id='${req.query.user_id}';`, (err, response)=> {
+                if(err){
+                    reject()
+                }
+                resolve(response.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((data)=> {
+        data.forEach(booking => {
+            const url = s3.getSignedUrl('getObject', {
+                Bucket: 'travelitinerary',
+                Key: booking.travel_itinerary,
+                Expires: 60 * 60
+            });
+            booking.travel_itinerary = url
+        })
+        
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "fetching bookings failed",
+            success: false
+        })
+    })
+})
+
 
 router.put('/', (req, res)=> {
     const data = req.body;
@@ -116,6 +154,39 @@ router.put('/', (req, res)=> {
     .catch(()=> {
         res.status(500).json({
             result: "booking updation failed",
+            success: false
+        })
+    })
+})
+
+router.get('/:id', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        connection.query(`select bookings.booking_id, users.user_name, bookings.booking_date, customers.customer_name, bookings.amount_paid, bookings.amount_payable, bookings.travel_itinerary from bookings join users on bookings.user_id=users.user_id join customers on bookings.customer_id=customers.customer_id where bookings.booking_id=${req.params.id};`, (err, response)=> {
+            if(err){
+                reject()
+            }
+            resolve(response.rows)
+        })
+    })
+
+    result.then((data)=> {
+        data.forEach(booking => {
+            const url = s3.getSignedUrl('getObject', {
+                Bucket: 'travelitinerary',
+                Key: booking.travel_itinerary,
+                Expires: 60 * 60
+            });
+            booking.travel_itinerary = url
+        })
+        
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "fetching bookings failed",
             success: false
         })
     })
