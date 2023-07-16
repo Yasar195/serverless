@@ -30,4 +30,34 @@ router.get('/', (req, res)=> {
     })
 })
 
+router.post('/', (req, res)=> {
+    const data = req.body;
+    const result = new Promise((resolve, reject) => {
+        if(data.booking_id&&data.status){
+            connection.query(`insert into progress (booking_id, progress_status, user_id) values (${data.booking_id}, '${data.status}', '${res.locals.uid}');`, (err)=> {
+                if(err){
+                    reject()
+                }
+                resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: 'customer status updated',
+            success:true
+        })
+    })
+    .catch(()=> {
+        res.status(400).json({
+            result: 'updating customer status failed',
+            success: false
+        })
+    })
+})
+
 module.exports = router
