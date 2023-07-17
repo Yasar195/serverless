@@ -130,6 +130,35 @@ router.get('/telecallers', (req, res)=> {
     })
 })
 
+router.get('/field', (req, res)=> {
+    const user = new Promise((resolve, reject) => {
+        if(req.query.dep_id){
+            connection.query(`select * from users where user_type='field staff' and dep_id=${req.query.dep_id};`, (err, result)=> {
+                if(err){
+                    reject()
+                }
+                resolve(result.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    user.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "fetching field staff data failed",
+            success: false
+        })
+    })
+})
+
 router.get('/dash', (req, res)=> {
     const result = new Promise((resolve, reject) => {
         const data = {}

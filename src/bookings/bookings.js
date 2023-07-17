@@ -27,7 +27,7 @@ router.post('/', (req, res)=> {
                     if(err){
                         reject()
                     }
-                    connection.query(`insert into bookings (booking_date, customer_id, user_id, amount_payable, amount_paid, travel_itinerary, dep_id, branch_id) values ('${date}', ${data.customer_id}, '${data.user_id}', '${data.amount_payable}', '${data.amount_paid}', '${key}', ${data.dep_id}, ${data.branch_id});`, (err)=> {
+                    connection.query(`insert into bookings (booking_date, customer_id, user_id, amount_payable, amount_paid, travel_itinerary, dep_id, branch_id, staff_id) values ('${date}', ${data.customer_id}, '${data.user_id}', '${data.amount_payable}', '${data.amount_paid}', '${key}', ${data.dep_id}, ${data.branch_id}, '${data.staff_id}');`, (err)=> {
                         if(err){
                             reject()
                         }
@@ -92,17 +92,12 @@ router.get('/', (req, res)=> {
 
 router.get('/staff', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
-        if(req.query.user_id){
-            connection.query(`select bookings.booking_id, users.user_name, bookings.booking_date, customers.customer_name, bookings.amount_paid, bookings.amount_payable, bookings.travel_itinerary from bookings join users on bookings.user_id=users.user_id join customers on bookings.customer_id=customers.customer_id where bookings.user_id='${req.query.user_id}';`, (err, response)=> {
-                if(err){
-                    reject()
-                }
-                resolve(response.rows)
-            })
-        }
-        else{
-            reject()
-        }
+        connection.query(`select bookings.booking_id, users.user_name, bookings.booking_date, customers.customer_name, bookings.travel_itinerary from bookings join users on bookings.user_id=users.user_id join customers on bookings.customer_id=customers.customer_id where bookings.staff_id='${res.locals.uid}';`, (err, response)=> {
+            if(err){
+                reject()
+            }
+            resolve(response.rows)
+        })
     })
 
     result.then((data)=> {
