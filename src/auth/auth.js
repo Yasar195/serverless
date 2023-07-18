@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
     const user = new Promise((resolve, reject) => {
         const now = new Date()
         const date = now.toLocaleDateString()
-        connection.query(`select users.user_id, users.user_name, users.profile_key, users.user_type, users.user_email, users.registered, users.dep_id, users.branch_id, departments.dep_name, departments.dep_image, branches.branch_name from users join departments on users.dep_id = departments.dep_id join branches on users.branch_id = branches.branch_id where users.user_id='${res.locals.uid}';`, (err, result)=> {
+        connection.query(`select users.user_id, users.user_name, users.profile_key, users.user_type, users.user_email, users.registered, users.dep_id, users.branch_id, departments.dep_name, departments.dep_image, departments.dep_color, branches.branch_name from users join departments on users.dep_id = departments.dep_id join branches on users.branch_id = branches.branch_id where users.user_id='${res.locals.uid}';`, (err, result)=> {
             if(err){
                 console.log(err)
                 reject()
