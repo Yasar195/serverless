@@ -33,8 +33,8 @@ router.get('/', (req, res)=> {
 router.post('/', (req, res)=> {
     const data = req.body;
     const result = new Promise((resolve, reject) => {
-        if(data.booking_id&&data.status){
-            connection.query(`insert into progress (booking_id, progress_status, user_id) values (${data.booking_id}, '${data.status}', '${res.locals.uid}');`, (err)=> {
+        if(data.booking_id&&data.status&&data.severe){
+            connection.query(`insert into progress (booking_id, progress_status, user_id, severe) values (${data.booking_id}, '${data.status}', '${res.locals.uid}', ${data.severe});`, (err)=> {
                 if(err){
                     reject()
                 }
