@@ -43,7 +43,7 @@ router.post('/', (req, res)=> {
 router.get('/', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id){
-            connection.query(`select bookings.booking_id, users.user_name, bookings.booking_date, customers.customer_name, bookings.amount_paid, bookings.amount_payable, bookings.travel_itinerary from bookings join users on bookings.user_id=users.user_id join customers on bookings.customer_id=customers.customer_id where bookings.dep_id=${req.query.dep_id};`, (err, response)=> {
+            connection.query(`select bookings.booking_id, users.user_name, bookings.booking_date, customers.customer_name, bookings.amount_paid, bookings.amount_payable from bookings join users on bookings.user_id=users.user_id join customers on bookings.customer_id=customers.customer_id where bookings.dep_id=${req.query.dep_id};`, (err, response)=> {
                 if(err){
                     reject()
                 }
