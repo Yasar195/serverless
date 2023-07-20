@@ -56,15 +56,6 @@ router.get('/', (req, res)=> {
     })
 
     result.then((data)=> {
-        data.forEach(booking => {
-            const url = s3.getSignedUrl('getObject', {
-                Bucket: 'travelitinerary',
-                Key: booking.travel_itinerary,
-                Expires: 60 * 60
-            });
-            booking.travel_itinerary = url
-        })
-        
         res.status(200).json({
             result: data,
             success: true
