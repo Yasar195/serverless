@@ -2,6 +2,12 @@ const connection = require('../utils/Connect')
 const router = require('express').Router()
 const s3 = require('../utils/aws')
 
+router.post('/', (req, res)=> {
+    const data = req.body;
+    console.log(data)
+    res.send('hi')
+})
+
 router.get('/', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id){
@@ -35,6 +41,150 @@ router.get('/', (req, res)=> {
         })
     })
 })
+
+router.put('/purchase', (req, res)=> {
+    const data = req.body;
+    const result = new Promise((resolve, reject)=> {
+        if(data.booking_id&&data.staff_id){
+            connection.query(`update bookings set staff_id='${data.staff_id}' where booking_id=${data.booking_id};`, (err)=> {
+                err ? reject(): resolve()
+            })
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: "bookings updated",
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(400).json({
+            result: "update bookings failed",
+            success: false
+        })
+    })
+})
+
+
+router.get('/purchase/booked', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.dep_id){
+            connection.query(`select bookings.booking_id, bookings.booking_date, customers.customer_name, users.user_name, bookings.start_date, bookings.end_date, bookings.bookables from bookings join customers on bookings.customer_id=customers.customer_id join users on bookings.staff_id=users.user_id where bookings.dep_id=${req.query.dep_id} and bookings.advance_paid=true and staff_id is not null order by booking_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
+                if(err){
+                    reject()
+                }
+                resolve(response.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((data)=> {
+        data.forEach((row)=> {
+            row.bookables = row.bookables.split(',')
+        })
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(400).json({
+            result: "fetching bookings failed",
+            success: false
+        })
+    })
+})
+
+
+router.get('/staff', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        connection.query(`select bookings.booking_id, bookings.booking_date, customers.customer_name, bookings.start_date, bookings.end_date from bookings join customers on bookings.customer_id=customers.customer_id where bookings.staff_id='${res.locals.uid}' limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
+            if(err){
+                reject()
+            }
+            resolve(response.rows)
+        })
+    })
+
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(400).json({
+            result: "fetching bookings failed",
+            success: false
+        })
+    })
+})
+
+router.get('/staff/tasks', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.booking_id){
+            connection.query(`select * from tasks where booking_id=${req.query.booking_id};`, (err, response)=> {
+                if(err){
+                    reject()
+                }
+                resolve(response.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(400).json({
+            result: "fetching tasks failed",
+            success: false
+        })
+    })
+})
+
+router.get('/purchase', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.dep_id){
+            connection.query(`select bookings.booking_id, bookings.booking_date, customers.customer_name, bookings.start_date, bookings.end_date, bookings.bookables from bookings join customers on bookings.customer_id=customers.customer_id where bookings.dep_id=${req.query.dep_id} and bookings.advance_paid=true and staff_id is null order by booking_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
+                if(err){
+                    reject()
+                }
+                resolve(response.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((data)=> {
+        data.forEach((row)=> {
+            row.bookables = row.bookables.split(',')
+        })
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(400).json({
+            result: "fetching bookings failed",
+            success: false
+        })
+    })
+})
+
 
 router.get('/complete', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
