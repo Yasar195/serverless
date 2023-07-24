@@ -97,7 +97,7 @@ router.get('/followup', (req, res)=> {
 
 router.get('/', async (req, res) => {
     const result = new Promise((resolve, reject)=> {
-        connection.query(`select * from customers join leads on customers.customer_id=leads.customer_id where leads.user_id = '${res.locals.uid}' and leads.follow_up=false;`, (err, result)=> {
+        connection.query(`select * from customers join leads on customers.customer_id=leads.customer_id where leads.user_id = '${res.locals.uid}' and leads.follow_up=false limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, result)=> {
             if(err){
                 reject()
             }
