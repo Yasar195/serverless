@@ -125,8 +125,7 @@ router.post('/createtours', async (req, res)=> {
     const file = req.files;
     const result = new Promise((resolve, reject)=> {
         if(data.dep_id&&data.tour_name&&data.tour_des&&data.tour_code){
-            console.log(`insert into tour (dep_id, tour_name, tour_des, tour_code${file? ', tour_pdf': ''}) values (${data.dep_id}, '${data.tour_name}', '${data.tour_des}', '${data.tour_code}', ${file? `${data.tour_code}.pdf`: ''});`)
-            connection.query(`insert into tour (dep_id, tour_name, tour_des, tour_code${file? ', tour_pdf': ''}) values (${data.dep_id}, '${data.tour_name}', '${data.tour_des}', '${data.tour_code}'${file? `, ${data.tour_code}.pdf`: ''});`, (err)=> {
+            connection.query(`insert into tour (dep_id, tour_name, tour_des, tour_code${file? ', tour_pdf': ''}) values (${data.dep_id}, '${data.tour_name}', '${data.tour_des}', '${data.tour_code}'${file? `, '${data.tour_code}.pdf'`: ''});`, (err)=> {
                 if(err){
                     console.log(err)
                     reject()
