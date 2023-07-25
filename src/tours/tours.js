@@ -122,10 +122,10 @@ router.get('/activity', async (req, res)=> {
 
 router.post('/createtours', async (req, res)=> {
     const data = req.body;
-    const file = req.files.pdf;
+    const file = req.files;
     const result = new Promise((resolve, reject)=> {
         if(data.dep_id&&data.tour_name&&data.tour_des&&data.tour_code){
-            connection.query(`insert into tour (dep_id, tour_name, tour_des, tour_code, tour_pdf) values (${data.dep_id}, '${data.tour_name}', '${data.tour_des}', '${data.tour_code}', '${key}');`, (err)=> {
+            connection.query(`insert into tour (dep_id, tour_name, tour_des, tour_code, ${file? 'tour_pdf': ''}) values (${data.dep_id}, '${data.tour_name}', '${data.tour_des}', '${data.tour_code}', ${file? `${data.tour_code}.pdf`: ''});`, (err)=> {
                 if(err){
                     reject()
                 }
@@ -134,7 +134,7 @@ router.post('/createtours', async (req, res)=> {
                     const params = {
                         Bucket: 'fixeditinerary',
                         Key: key,
-                        Body: file.data,
+                        Body: file.pdf.data,
                     };
                     s3.upload(params, function (err) {
                         if (err) {
@@ -144,6 +144,7 @@ router.post('/createtours', async (req, res)=> {
                 }
                 resolve()
             })
+            resolve()
         }
         else{
             reject()
