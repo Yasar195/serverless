@@ -4,9 +4,10 @@ const router = require('express').Router()
 router.post('/', (req, res)=> {
     const data = req.body
     const result = new Promise((resolve, reject)=> {
-        if(data.tour_id&&data.vehicle_name&&data.vehicle_price&&data.vehicle_category){
-            connection.query(`insert into vehicles (tour_id, vehicle_name, vehicle_price, vehicle_category) values (${data.tour_id}, '${data.vehicle_name}', ${data.vehicle_price}, '${data.vehicle_category}');`, (err)=> {
+        if(data.tour_id&&data.vehicle_name&&data.daytour_price&&data.pickupprice&&data.dropoffprice&&data.addonprice&&data.vehicle_category){
+            connection.query(`insert into vehicles (tour_id, vehicle_name, daytour_price, pickup_price, dropoff_price, addon_price, vehicle_category) values (${data.tour_id}, '${data.vehicle_name}', ${data.daytour_price}, ${data.pickupprice}, ${data.dropoffprice}, ${data.addonprice},'${data.vehicle_category}');`, (err)=> {
                 if(err){
+                    console.log(err)
                     reject()
                 }
                 resolve()

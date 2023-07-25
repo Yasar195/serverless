@@ -193,36 +193,6 @@ router.get('/oldleads', async (req, res)=> {
     })
 })
 
-// router.get('/booked', (req, res)=> {
-//     const result = new Promise((resolve, reject)=> {
-//         if(req.query.dep_id){
-//             connection.query(`select users.user_name, customers.customer_name, customers.tour_code, users.user_id, users.points, customers.customer_id from customers join users on customers.user_id=users.user_id where customers.customer_progress='Booked' and customers.booked=false and customers.dep_id=${req.query.dep_id};`, (err, response)=> {
-//                 if(err){
-//                     console.log(err)
-//                     reject()
-//                 }
-//                 resolve(response.rows)
-//             })
-//         }
-//         else{
-//             reject()
-//         }
-//     })
-
-//     result.then((data)=> {
-//         res.status(200).json({
-//             result: data,
-//             success: true
-//         })
-//     })
-//     .catch(()=> {
-//         res.status(500).json({
-//             result: "fetching user failed",
-//             success: false
-//         })
-//     })
-// })
-
 router.get('/activity/:id', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         connection.query(`select * from user_activity where user_id='${req.params.id}';`, (err, response)=> {
