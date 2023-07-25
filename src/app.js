@@ -15,6 +15,7 @@ const vehicles = require('./vehicles/vehicles')
 const bookings = require('./bookings/bookings')
 const progress = require('./progress/progress')
 const transactions = require('./transactions/transactions')
+const foods = require('./food/food')
 const fileUpload = require('express-fileupload');
 const { authenticate, router } = require('../src/auth/auth')
 const cors = require('cors')
@@ -46,6 +47,7 @@ app.use('/vehicles', vehicles)
 app.use('/bookings', bookings)
 app.use('/progress', progress)
 app.use('/transactions', transactions)
+app.use('/foods', foods)
 
 
 module.exports = app
