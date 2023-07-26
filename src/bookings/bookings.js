@@ -4,31 +4,36 @@ const s3 = require('../utils/aws')
 
 router.post('/', (req, res)=> {
     const data = req.body;
-    console.log(data)
     const result = new Promise((resolve, reject)=> {
-        // if(data.customer_id&&data.amount_payable&&data.advance_amount&&data.tasks.length!=0&&data.bookables&&data.tour_id&&data.start_date&&data.end_date&&data.dep_id&&data.branch_id){
-        //     const string = String(data.bookables)
-        //     connection.query(`insert into bookings (customer_id, user_id, amount_payable, advance_amount, bookables, tour_id, start_date, end_date, dep_id, branch_id) values (${data.customer_id}, '${res.locals.uid}', ${data.amount_payable}, ${data.advance_amount}, '${string}', ${data.tour_id}, '${data.start_date}', '${data.end_date}', ${data.dep_id}, ${data.branch_id}) returning booking_id;`, (err, response)=> {
-        //         if(err){
-        //             console.log(err)
-        //             reject()
-        //         }
-        //         const booking_id = response.rows[0].booking_id;
-        //         data.tasks.forEach((task, index)=> {
-        //             connection.query(`insert into tasks (booking_id, task) values (${booking_id}, '${task}');`, (err)=> {
-        //                 if(err){
-        //                     reject()
-        //                 }
-        //             })
-        //             if(index === data.tasks.length-1){
-        //                 resolve()
-        //             }
-        //         })
-        //     })
-        // }
-        // else{
-        //     reject()
-        // }
+        if(data.customer_id&&data.amount_payable&&data.advance_amount&&data.tasks.length!=0&&data.bookables&&data.tour_id&&data.start_date&&data.end_date&&data.dep_id&&data.branch_id){
+            const string = String(data.bookables)
+            connection.query(`insert into bookings (customer_id, user_id, amount_payable, advance_amount, bookables, tour_id, start_date, end_date, dep_id, branch_id) values (${data.customer_id}, '${res.locals.uid}', ${data.amount_payable}, ${data.advance_amount}, '${string}', ${data.tour_id}, '${data.start_date}', '${data.end_date}', ${data.dep_id}, ${data.branch_id}) returning booking_id;`, (err, response)=> {
+                if(err){
+                    reject()
+                }
+                const booking_id = response.rows[0].booking_id;
+                data.tasks.forEach((day)=> {
+                    connection.query(`insert into days(booking_id) values (${booking_id}) returning day_id;`, (err, dayres)=> {
+                        if(err){
+                            reject()
+                        }
+                        const day_id = dayres.rows[0].day_id;
+                        day.forEach(task=> {
+                            connection.query(`insert into tasks (day_id, task) values (${day_id}, '${task}');`, (err)=> {
+                                if(err){
+                                    reject()
+                                }
+                                resolve()
+                            })
+                        })
+                    })
+                })
+                resolve()
+            })
+        }
+        else{
+            reject()
+        }
         resolve()
     })
 
@@ -165,11 +170,22 @@ router.get('/staff', (req, res)=> {
 router.get('/staff/tasks', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.booking_id){
-            connection.query(`select * from tasks where booking_id=${req.query.booking_id};`, (err, response)=> {
+            connection.query(`select * from days where booking_id=${req.query.booking_id};`, (err, response)=> {
                 if(err){
                     reject()
                 }
-                resolve(response.rows)
+                const result = []
+                response.rows.forEach(async (day, index) => {
+                    connection.query(`select * from tasks where day_id=${day.day_id};`, (err, taskres)=> {
+                        if(err){
+                            reject()
+                        }
+                        result.push([...taskres.rows])
+                        if(index === response.rows.length-1){
+                            resolve(result)
+                        }
+                    })
+                })
             })
         }
         else{
