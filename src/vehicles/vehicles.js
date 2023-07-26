@@ -93,32 +93,13 @@ router.post('/booking', (req, res)=> {
 
 router.post('/available', (req, res)=> {
     const data = req.body
-    const start_date = data.start_date
     const result = new Promise((resolve, reject)=> {
-        const res = {}
-        if(data.tour_id&&data.start_date&&data.end_date&&data.vehicle_category){
+        if(data.tour_id&&data.vehicle_category){
             connection.query(`select * from vehicles where tour_id=${data.tour_id} and vehicle_category='${data.vehicle_category}';`, (err, result)=> {
                 if(err){
                     reject()
                 }
-                res.vehicles = result.rows
-                res.bookings = []
-                if(res.vehicles.length != 0){
-                    result.rows.forEach((row, index)=> {
-                        connection.query(`select * from vehicle_bookings where vehicle_id=${row.vehicle_id};`, (err, indres)=> {
-                            if(err){
-                                reject()
-                            }
-                            res.bookings[index] = indres.rows
-                            if(index === result.rows.length-1){
-                                resolve(res)
-                            }
-                        })
-                    })
-                }
-                else{
-                    resolve(res)
-                }
+                resolve(result.rows)
             })
         }
         else{
@@ -126,23 +107,7 @@ router.post('/available', (req, res)=> {
         }
     })
     
-    result.then((result)=> {
-        let data
-        if(result.vehicles.length !== 0){
-            data = result.vehicles
-            result.vehicles.forEach((room, index)=> {
-                result.bookings[index].forEach(booking => {
-                    const date = new Date(start_date)
-                    if(date<=booking.end_date){
-                        data.splice(index, 1)
-                    }
-                })
-            })
-        }
-        else{
-            data = []
-        }
-
+    result.then((data)=> {
         res.status(200).json({
             result: data,
             success: true

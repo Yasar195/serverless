@@ -4,30 +4,32 @@ const s3 = require('../utils/aws')
 
 router.post('/', (req, res)=> {
     const data = req.body;
+    console.log(data)
     const result = new Promise((resolve, reject)=> {
-        if(data.customer_id&&data.amount_payable&&data.advance_amount&&data.tasks.length!=0&&data.bookables&&data.tour_id&&data.start_date&&data.end_date&&data.dep_id&&data.branch_id){
-            const string = String(data.bookables)
-            connection.query(`insert into bookings (customer_id, user_id, amount_payable, advance_amount, bookables, tour_id, start_date, end_date, dep_id, branch_id) values (${data.customer_id}, '${res.locals.uid}', ${data.amount_payable}, ${data.advance_amount}, '${string}', ${data.tour_id}, '${data.start_date}', '${data.end_date}', ${data.dep_id}, ${data.branch_id}) returning booking_id;`, (err, response)=> {
-                if(err){
-                    console.log(err)
-                    reject()
-                }
-                const booking_id = response.rows[0].booking_id;
-                data.tasks.forEach((task, index)=> {
-                    connection.query(`insert into tasks (booking_id, task) values (${booking_id}, '${task}');`, (err)=> {
-                        if(err){
-                            reject()
-                        }
-                    })
-                    if(index === data.tasks.length-1){
-                        resolve()
-                    }
-                })
-            })
-        }
-        else{
-            reject()
-        }
+        // if(data.customer_id&&data.amount_payable&&data.advance_amount&&data.tasks.length!=0&&data.bookables&&data.tour_id&&data.start_date&&data.end_date&&data.dep_id&&data.branch_id){
+        //     const string = String(data.bookables)
+        //     connection.query(`insert into bookings (customer_id, user_id, amount_payable, advance_amount, bookables, tour_id, start_date, end_date, dep_id, branch_id) values (${data.customer_id}, '${res.locals.uid}', ${data.amount_payable}, ${data.advance_amount}, '${string}', ${data.tour_id}, '${data.start_date}', '${data.end_date}', ${data.dep_id}, ${data.branch_id}) returning booking_id;`, (err, response)=> {
+        //         if(err){
+        //             console.log(err)
+        //             reject()
+        //         }
+        //         const booking_id = response.rows[0].booking_id;
+        //         data.tasks.forEach((task, index)=> {
+        //             connection.query(`insert into tasks (booking_id, task) values (${booking_id}, '${task}');`, (err)=> {
+        //                 if(err){
+        //                     reject()
+        //                 }
+        //             })
+        //             if(index === data.tasks.length-1){
+        //                 resolve()
+        //             }
+        //         })
+        //     })
+        // }
+        // else{
+        //     reject()
+        // }
+        resolve()
     })
 
     result.then(()=> {

@@ -92,32 +92,13 @@ router.post('/booking', (req, res)=> {
 
 router.post('/available', (req, res)=> {
     const data = req.body
-    const start_date = data.start_date
     const result = new Promise((resolve, reject)=> {
-        const res = {}
-        if(data.tour_id&&data.start_date&&data.end_date&&data.room_category){
+        if(data.tour_id&&data.room_category){
             connection.query(`select * from rooms where tour_id=${data.tour_id} and room_category='${data.room_category}';`, (err, result)=> {
                 if(err){
                     reject()
                 }
-                res.rooms = result.rows
-                res.bookings = []
-                if(res.rooms.length != 0){
-                    result.rows.forEach((row, index)=> {
-                        connection.query(`select * from room_bookings where room_id=${row.room_id};`, (err, indres)=> {
-                            if(err){
-                                reject()
-                            }
-                            res.bookings[index] = indres.rows
-                            if(index === result.rows.length-1){
-                                resolve(res)
-                            }
-                        })
-                    })
-                }
-                else{
-                    resolve(res)
-                }
+                resolve(result.rows)
             })
         }
         else{
@@ -126,24 +107,8 @@ router.post('/available', (req, res)=> {
     })
     
     result.then((result)=> {
-        let data
-        if(result.rooms.length !== 0){
-            data = result.rooms
-            result.rooms.forEach((room, index)=> {
-                result.bookings[index].forEach(booking => {
-                    const date = new Date(start_date)
-                    if(date<=booking.end_date){
-                        data.splice(index, 1)
-                    }
-                })
-            })
-        }
-        else{
-            data = []
-        }
-
         res.status(200).json({
-            result: data,
+            result: result,
             success: true
         })
     })
