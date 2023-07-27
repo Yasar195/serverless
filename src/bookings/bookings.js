@@ -85,6 +85,36 @@ router.get('/', (req, res)=> {
     })
 })
 
+router.get('/service', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.dep_id){
+            connection.query(`select bookings.booking_id, bookings.start_date, bookings.end_date ,customers.customer_name, customers.customer_phone from bookings join customers on bookings.customer_id=customers.customer_id where bookings.dep_id=${req.query.dep_id} and bookings.status!='Completed' order by booking_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
+                if(err){
+                    console.log(err)
+                    reject()
+                }
+                resolve(response.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(400).json({
+            result: "fetching bookings failed",
+            success: false
+        })
+    })
+})
+
 router.put('/purchase', (req, res)=> {
     const data = req.body;
     const result = new Promise((resolve, reject)=> {
