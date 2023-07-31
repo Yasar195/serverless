@@ -51,7 +51,7 @@ router.post('/', (req, res)=> {
     })
 })
 
-router.delete('/', (req, res)=> {
+router.put('/', (req, res)=> {
     const data = req.body;
     const result = new Promise((resolve, reject)=> {
         if(data.booking_id){
