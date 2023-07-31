@@ -1,3 +1,4 @@
+const { constants } = require('fs/promises');
 const connection = require('../utils/Connect')
 const router = require('express').Router()
 const s3 = require('../utils/aws')
@@ -34,7 +35,6 @@ router.post('/', (req, res)=> {
         else{
             reject()
         }
-        resolve()
     })
 
     result.then(()=> {
@@ -46,6 +46,65 @@ router.post('/', (req, res)=> {
     .catch(()=> {
         res.status(500).json({
             result: "bookings failed",
+            success: false
+        })
+    })
+})
+
+router.delete('/', (req, res)=> {
+    const data = req.body;
+    const result = new Promise((resolve, reject)=> {
+        if(data.booking_id){
+            connection.query(`delete from transactions where booking_id=${data.booking_id};`, (err)=> {
+                if(err){
+                    reject()
+                }
+                connection.query(`select day_id from days where booking_id=${data.booking_id};`, (err, resday)=> {
+                    if(err){
+                        reject()
+                    }
+                    resday.rows.forEach((day, index) => {
+                        connection.query(`delete from tasks where day_id=${day.day_id};`, (err)=> {
+                            if(err){
+                                reject()
+                            }
+                            if(index === resday.rows.length-1){
+                                connection.query(`delete from days where booking_id=${data.booking_id};`, (err)=> {
+                                    if(err){
+                                        reject()
+                                    }
+                                    connection.query(`delete from bookings where booking_id=${data.booking_id} returning points, user_id;`, (err, resid)=> {
+                                        if(err){
+                                            reject()
+                                        }
+                                        connection.query(`update users set points=points-${parseInt(resid.rows[0].points)} where user_id='${resid.rows[0].user_id}';`, (err)=> {
+                                            if(err){
+                                                reject()
+                                            }
+                                            resolve()
+                                        })
+                                    })
+                                })
+                            }
+                        })
+                    })
+                })
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: "deletion success",
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "deletion failed",
             success: false
         })
     })
