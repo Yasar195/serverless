@@ -13,7 +13,7 @@ const authenticate = async (req, res, next) => {
             const decodedToken = await admin.auth().verifyIdToken(token);
             resolve(decodedToken)
         } catch(err){
-            reject("error")
+            reject()
         }
     })
 

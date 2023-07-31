@@ -459,11 +459,19 @@ router.put('/makepayments', (req, res)=> {
                 if(err){
                     reject()
                 }
-                connection.query(`update bookings set messages=null, is_notif=false, advance_paid=true, amount_paid=amount_paid+${parseInt(data.amount)} where booking_id=${data.booking_id};`, (err)=> {
+                connection.query(`update bookings set messages=null, is_notif=false, advance_paid=true, amount_paid=amount_paid+${parseInt(data.amount)} where booking_id=${data.booking_id} returning user_id;`, (err, resuser)=> {
                     if(err){
                         reject()
                     }
-                    resolve()
+                    const user_id = resuser.rows[0].user_id
+                    const amount = parseInt(data.amount)
+                    const points = Math.floor((amount*0.03)/20)
+                    connection.query(`update users set points=points+${points} where user_id='${user_id}';`, (err)=> {
+                        if(err){
+                            reject()
+                        }
+                        resolve()
+                    })
                 })
             })
         }
