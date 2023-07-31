@@ -22,7 +22,7 @@ const authenticate = async (req, res, next) => {
         res.locals.email = usercred.email
         next()
     })
-    .catch((err)=> {
+    .catch(()=> {
         res.status(404).json({
             result: "user not found",
             success: false

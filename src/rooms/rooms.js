@@ -4,8 +4,8 @@ const router = require('express').Router()
 router.post('/', (req, res)=> {
     const data = req.body
     const result = new Promise((resolve, reject)=> {
-        if(data.tour_id&&data.room_number&&data.room_building&&data.room_price&&data.room_category){
-            connection.query(`insert into rooms (tour_id, room_number, room_building, room_price, room_category) values (${data.tour_id}, ${data.room_number}, '${data.room_building}', ${data.room_price}, '${data.room_category}');`, (err)=> {
+        if(data.tour_id&&data.room_number&&data.room_building&&data.room_price&&data.room_category&&data.room_type){
+            connection.query(`insert into rooms (tour_id, room_number, room_building, room_price, room_category, room_type) values (${data.tour_id}, ${data.room_number}, '${data.room_building}', ${data.room_price}, '${data.room_category}', '${data.room_type}');`, (err)=> {
                 if(err){
                     reject()
                 }
@@ -94,7 +94,7 @@ router.post('/available', (req, res)=> {
     const data = req.body
     const result = new Promise((resolve, reject)=> {
         if(data.tour_id&&data.room_category){
-            connection.query(`select * from rooms where tour_id=${data.tour_id} and room_category='${data.room_category}';`, (err, result)=> {
+            connection.query(`select * from rooms where tour_id=${data.tour_id} and room_category='${data.room_category}' ${data.room_type? ` and room_type='${data.room_type}'`: ''};`, (err, result)=> {
                 if(err){
                     reject()
                 }
