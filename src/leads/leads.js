@@ -10,7 +10,7 @@ router.post('/', async (req, res) => {
                     reject()
                 }
                 if(data.follow_date){
-                    connection.query(`insert into leads (user_id, customer_id, follow_up, follow_up_date, dep_id, branch_id) values ('${data.user_id}', ${data.customer_id}, true, '${data.follow_date}', ${data.dep_id}, ${data.branch_id});`, (err, response) => {
+                    connection.query(`insert into leads (user_id, customer_id, follow_up, follow_up_date, dep_id, branch_id) values ('${data.user_id}', ${data.customer_id}, true, '${data.follow_date}', ${data.dep_id}, ${data.branch_id});`, (err) => {
                         if(err){
                             reject()
                         }
@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
                     })
                 }
                 else{
-                    connection.query(`insert into leads (user_id, customer_id, dep_id, branch_id) values ('${data.user_id}', ${data.customer_id}, ${data.dep_id}, ${data.branch_id});`, (err, response) => {
+                    connection.query(`insert into leads (user_id, customer_id, dep_id, branch_id) values ('${data.user_id}', ${data.customer_id}, ${data.dep_id}, ${data.branch_id});`, (err) => {
                         if(err){
                             reject()
                         }
