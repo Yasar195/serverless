@@ -19,7 +19,7 @@ const transactions = require('./transactions/transactions')
 const foods = require('./food/food')
 const fileUpload = require('express-fileupload');
 const { authenticate, router } = require('../src/auth/auth')
-const cors = require('cors')
+const cors = require('cors');
 
 app.get('/', (req, res)=> {
     res.status(200).json({
@@ -80,6 +80,14 @@ app.use('/bookings', bookings)
 app.use('/progress', progress)
 app.use('/transactions', transactions)
 app.use('/foods', foods)
+
+
+app.all('*', (req, res)=> {
+    res.status(404).json({
+        result: "invalid uri",
+        success: false
+    })
+})
 
 
 module.exports = app
