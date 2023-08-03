@@ -84,7 +84,7 @@ app.use('/foods', foods)
 
 app.all('*', (req, res)=> {
     res.status(404).json({
-        result: "invalid uri",
+        result: "requested resource not found",
         success: false
     })
 })

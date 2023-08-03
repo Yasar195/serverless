@@ -23,8 +23,8 @@ const authenticate = async (req, res, next) => {
         next()
     })
     .catch(()=> {
-        res.status(404).json({
-            result: "user not found",
+        res.status(403).json({
+            result: "You are not authorized to access this resource",
             success: false
         })
     })
