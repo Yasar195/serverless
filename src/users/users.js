@@ -32,7 +32,7 @@ router.get('/', async (req, res)=> {
     })
 })
 
-app.post('/', async (req, res)=> {
+router.post('/', async (req, res)=> {
     const customer = req.body
     const upload = new Promise((resolve, reject)=> {
         if(customer.customer_name && customer.customer_phone && customer.customer_vehicle && customer.customer_whatapp && customer.customer_progress && customer.customer_source && customer.customer_address && customer.customer_city && customer.customer_remarks && customer.dep_id && customer.branch_id && String(customer.customer_pax) && customer.customer_category){
