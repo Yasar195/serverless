@@ -32,6 +32,36 @@ router.get('/', async (req, res)=> {
     })
 })
 
+app.post('/', async (req, res)=> {
+    const customer = req.body
+    const upload = new Promise((resolve, reject)=> {
+        if(customer.customer_name && customer.customer_phone && customer.customer_vehicle && customer.customer_whatapp && customer.customer_progress && customer.customer_source && customer.customer_address && customer.customer_city && customer.customer_remarks && customer.dep_id && customer.branch_id && String(customer.customer_pax) && customer.customer_category){
+            connection.query(`insert into customers (customer_name, customer_phone,customer_vehicle, customer_whatsapp, customer_progress, customer_pax, customer_source, customer_address, customer_category, customer_city, customer_remarks, dep_id, user_id, branch_id) values ('${customer.customer_name}', '${customer.customer_phone}', '${customer.customer_vehicle}', '${customer.customer_whatapp}', '${customer.customer_progress}', ${customer.customer_pax}, '${customer.customer_source}', '${customer.customer_address}', '${customer.customer_category}','${customer.customer_city}', '${customer.customer_remarks}', ${customer.dep_id}, '${res.locals.uid}', ${customer.branch_id});`, (err)=> {
+                if(err){
+                    reject()
+                }
+                resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    upload.then(()=> {
+        res.status(200).json({
+            result: "user data upload success",
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "user data upload failed",
+            success: false
+        })
+    })
+})
+
 router.put('/', async (req, res)=> {
     const customer = req.body
     const upload = new Promise((resolve, reject)=> {
