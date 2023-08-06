@@ -94,16 +94,18 @@ router.post('/available', (req, res)=> {
     const data = req.body
     const response = []
     const result = new Promise((resolve, reject)=> {
-        if(data.tour_id&&data.room_category.length !==0){
+        if(data.tour_id&&data.room_category.length !==0&&data.room_type.length !== 0){
             data.room_category.forEach((cat, index)=> {
-                connection.query(`select * from rooms where tour_id=${data.tour_id} and room_category='${cat}' ${data.room_type? ` and room_type='${data.room_type}'`: ''};`, (err, result)=> {
-                    if(err){
-                        reject()
-                    }
-                    response.push(...result.rows)
-                    if(data.room_category.length-1===index){
-                        resolve(response)
-                    }
+                data.room_type.forEach((type, ind) => {
+                    connection.query(`select * from rooms where tour_id=${data.tour_id} and room_category='${cat}' and room_type='${type}';`, (err, result)=> {
+                        if(err){
+                            reject()
+                        }
+                        response.push(...result.rows)
+                        if(data.room_category.length-1===index&&data.room_type.length-1===ind){
+                            resolve(response)
+                        }
+                    })
                 })
             })
         }
