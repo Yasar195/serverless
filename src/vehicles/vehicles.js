@@ -93,13 +93,19 @@ router.post('/booking', (req, res)=> {
 
 router.post('/available', (req, res)=> {
     const data = req.body
+    const response = []
     const result = new Promise((resolve, reject)=> {
-        if(data.tour_id&&data.vehicle_category){
-            connection.query(`select * from vehicles where tour_id=${data.tour_id} and vehicle_category='${data.vehicle_category}';`, (err, result)=> {
-                if(err){
-                    reject()
-                }
-                resolve(result.rows)
+        if(data.tour_id&&data.vehicle_category.length!==0){
+            data.vehicle_category.forEach((cat, index)=> {
+                connection.query(`select * from vehicles where tour_id=${data.tour_id} and vehicle_category='${cat}';`, (err, result)=> {
+                    if(err){
+                        reject()
+                    }
+                    response.push(...result.rows)
+                    if(data.vehicle_category.length-1 === index){
+                        resolve(response)
+                    }
+                })
             })
         }
         else{
