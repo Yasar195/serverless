@@ -97,7 +97,7 @@ router.post('/available', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(data.tour_id&&data.vehicle_category.length!==0){
             data.vehicle_category.forEach((cat, index)=> {
-                connection.query(`select * from vehicles where tour_id=${data.tour_id} and vehicle_category='${cat}';`, (err, result)=> {
+                connection.query(`select * from vehicles where tour_id=${data.tour_id} and vehicle_category=${cat};`, (err, result)=> {
                     if(err){
                         reject()
                     }
