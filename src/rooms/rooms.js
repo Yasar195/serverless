@@ -97,7 +97,7 @@ router.post('/available', (req, res)=> {
         if(data.tour_id&&data.room_category.length !==0&&data.room_type.length !== 0){
             data.room_category.forEach((cat, index)=> {
                 data.room_type.forEach((type, ind) => {
-                    connection.query(`select * from rooms where tour_id=${data.tour_id} and room_category='${cat}' and room_type='${type}';`, (err, result)=> {
+                    connection.query(`select * from rooms where tour_id=${data.tour_id} and room_category=${cat} and room_type='${type}';`, (err, result)=> {
                         if(err){
                             reject()
                         }
