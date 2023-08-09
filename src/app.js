@@ -12,6 +12,7 @@ const pdf = require('./pdf/pdf');
 const audio = require('./audio/audio')
 const leaves = require('./leaves/leaves')
 const rooms = require('./rooms/rooms')
+const snapshots = require('./snapshots/snapshots')
 const vehicles = require('./vehicles/vehicles')
 const bookings = require('./bookings/bookings')
 const progress = require('./progress/progress')
@@ -79,6 +80,7 @@ app.use('/vehicles', vehicles)
 app.use('/bookings', bookings)
 app.use('/progress', progress)
 app.use('/transactions', transactions)
+app.use('/snapshots', snapshots)
 app.use('/foods', foods)
 
 
