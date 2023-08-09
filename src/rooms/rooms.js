@@ -60,35 +60,35 @@ router.get('/', (req, res)=> {
     })
 })
 
-router.post('/booking', (req, res)=> {
-    const data = req.body
-    const result = new Promise((resolve, reject)=> {
-        if(data.room_id&&data.start_date&&data.end_date){
-            connection.query(`insert into room_bookings (room_id, start_date, end_date) values (${data.room_id}, '${data.start_date}', '${data.end_date}');`, (err)=> {
-                if(err){
-                    reject()
-                }
-                resolve()
-            })
-        }
-        else{
-            reject()
-        }
-    })
+// router.post('/booking', (req, res)=> {
+//     const data = req.body
+//     const result = new Promise((resolve, reject)=> {
+//         if(data.room_id&&data.start_date&&data.end_date){
+//             connection.query(`insert into room_bookings (room_id, start_date, end_date) values (${data.room_id}, '${data.start_date}', '${data.end_date}');`, (err)=> {
+//                 if(err){
+//                     reject()
+//                 }
+//                 resolve()
+//             })
+//         }
+//         else{
+//             reject()
+//         }
+//     })
     
-    result.then(()=> {
-        res.status(200).json({
-            result: 'room booked successfully',
-            success: true
-        })
-    })
-    .catch(()=> {
-        res.status(500).json({
-            result: 'room booking failed',
-            success: false
-        })
-    })
-})
+//     result.then(()=> {
+//         res.status(200).json({
+//             result: 'room booked successfully',
+//             success: true
+//         })
+//     })
+//     .catch(()=> {
+//         res.status(500).json({
+//             result: 'room booking failed',
+//             success: false
+//         })
+//     })
+// })
 
 router.post('/available', (req, res)=> {
     const data = req.body
@@ -124,6 +124,36 @@ router.post('/available', (req, res)=> {
         console.log(err)
         res.status(500).json({
             result: 'available room fetch failed',
+            success: false
+        })
+    })
+})
+
+router.post('/cat', (req, res)=> {
+    const data = req.body
+    const result = new Promise((resolve, reject)=> {
+        if(data.dep_id&&data.room_cat){
+            connection.query(`insert into room_cate(dep_id, cat_name) values(${data.dep_id}, '${data.room_cat}');`, (err, result)=> {
+                if(err){
+                    reject()
+                }
+                resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+    
+    result.then(()=> {
+        res.status(200).json({
+            result: 'room category added',
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'adding room category failed',
             success: false
         })
     })

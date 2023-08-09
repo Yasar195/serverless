@@ -61,35 +61,35 @@ router.get('/', (req, res)=> {
     })
 })
 
-router.post('/booking', (req, res)=> {
-    const data = req.body
-    const result = new Promise((resolve, reject)=> {
-        if(data.vehicle_id&&data.start_date&&data.end_date){
-            connection.query(`insert into vehicle_bookings (vehicle_id, start_date, end_date) values (${data.vehicle_id}, '${data.start_date}', '${data.end_date}');`, (err)=> {
-                if(err){
-                    reject()
-                }
-                resolve()
-            })
-        }
-        else{
-            reject()
-        }
-    })
+// router.post('/booking', (req, res)=> {
+//     const data = req.body
+//     const result = new Promise((resolve, reject)=> {
+//         if(data.vehicle_id&&data.start_date&&data.end_date){
+//             connection.query(`insert into vehicle_bookings (vehicle_id, start_date, end_date) values (${data.vehicle_id}, '${data.start_date}', '${data.end_date}');`, (err)=> {
+//                 if(err){
+//                     reject()
+//                 }
+//                 resolve()
+//             })
+//         }
+//         else{
+//             reject()
+//         }
+//     })
     
-    result.then(()=> {
-        res.status(200).json({
-            result: 'vehicle booked successfully',
-            success: true
-        })
-    })
-    .catch(()=> {
-        res.status(500).json({
-            result: 'vehicle booking failed',
-            success: false
-        })
-    })
-})
+//     result.then(()=> {
+//         res.status(200).json({
+//             result: 'vehicle booked successfully',
+//             success: true
+//         })
+//     })
+//     .catch(()=> {
+//         res.status(500).json({
+//             result: 'vehicle booking failed',
+//             success: false
+//         })
+//     })
+// })
 
 router.post('/available', (req, res)=> {
     const data = req.body
@@ -120,9 +120,38 @@ router.post('/available', (req, res)=> {
         })
     })
     .catch((err)=> {
-        console.log(err)
         res.status(500).json({
             result: 'available vehicle fetch failed',
+            success: false
+        })
+    })
+})
+
+router.post('/cat', (req, res)=> {
+    const data = req.body
+    const result = new Promise((resolve, reject)=> {
+        if(data.dep_id&&data.vehicle_cat){
+            connection.query(`insert into vehicle_cate(dep_id, cat_name) values(${data.dep_id}, '${data.vehicle_cat}');`, (err, result)=> {
+                if(err){
+                    reject()
+                }
+                resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+    
+    result.then(()=> {
+        res.status(200).json({
+            result: 'room category added',
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'adding room category failed',
             success: false
         })
     })
