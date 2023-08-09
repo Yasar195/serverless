@@ -202,8 +202,8 @@ router.post('/createplace', async (req, res)=> {
 router.post('/createactivity', async (req, res)=> {
     const data = req.body;
     const result = new Promise((resolve, reject)=> {
-        if(data.place_id&&data.activity_name&&data.activity_des){
-            connection.query(`insert into activity (place_id, activity_name, activity_des) values (${data.place_id}, '${data.activity_name}', '${data.activity_des}');`, (err)=> {
+        if(data.place_id&&data.activity_name&&data.activity_des&&data.activity_price){
+            connection.query(`insert into activity (place_id, activity_name, activity_des, activity_price) values (${data.place_id}, '${data.activity_name}', '${data.activity_des}', ${data.activity_price});`, (err)=> {
                 if(err){
                     reject()
                 }
