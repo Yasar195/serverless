@@ -5,7 +5,7 @@ router.post('/', (req, res)=> {
     const data = req.body
     const result = new Promise((resolve, reject)=> {
         if(data.tour_id&&data.room_number&&data.room_building&&data.room_price&&data.room_category&&data.room_type){
-            connection.query(`insert into rooms (tour_id, room_number, room_building, room_price, room_category, room_type) values (${data.tour_id}, ${data.room_number}, '${data.room_building}', ${data.room_price}, '${data.room_category}', '${data.room_type}');`, (err)=> {
+            connection.query(`insert into rooms (tour_id, room_number, room_building, room_price, room_category, room_type) values (${data.tour_id}, ${data.room_number}, '${data.room_building}', ${data.room_price}, ${data.room_category}, '${data.room_type}');`, (err)=> {
                 if(err){
                     reject()
                 }
