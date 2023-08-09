@@ -157,4 +157,33 @@ router.post('/cat', (req, res)=> {
     })
 })
 
+router.get('/cat', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.dep_id){
+            connection.query(`select * from vehicle_cate where dep_id=${req.query.dep_id};`, (err, result)=> {
+                if(err){
+                    reject()
+                }
+                resolve(result.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+    
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'fetching vehicle categories failed',
+            success: false
+        })
+    })
+})
+
 module.exports = router
