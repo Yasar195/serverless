@@ -190,7 +190,13 @@ router.get('/dash', (req, res)=> {
                                         reject()
                                     }
                                     data.bookings = bookres.rows[0].count
-                                    resolve(data)
+                                    connection.query(`select count(*) from bookings where dep_id=${req.query.dep_id} where payment_complete=true;`, (err, bookres)=> {
+                                        if(err){
+                                            reject()
+                                        }
+                                        data.completed = bookres.rows[0].count
+                                        resolve(data)
+                                    })
                                 })
                             })
                         })
