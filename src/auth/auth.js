@@ -38,7 +38,13 @@ router.get('/', async (req, res) => {
             if(err){
                 reject()
             }
-            resolve(result.rows)
+            const registered = result.rows[0].registered
+            if(registered){
+                resolve(result.rows)
+            }
+            else{
+                reject()
+            }
         })
     })
     user.then(async (data)=> {
