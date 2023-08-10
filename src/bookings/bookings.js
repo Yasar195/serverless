@@ -1,35 +1,57 @@
 const { constants } = require('fs/promises');
 const connection = require('../utils/Connect')
 const router = require('express').Router()
+const { generateRandomString } = require('../utils/utils')
 const s3 = require('../utils/aws')
 
 router.post('/', (req, res)=> {
-    const data = req.body;
+    const data = JSON.parse(req.body.data);
+
+    const key = `${generateRandomString(10)}.pdf`
+    if(!req.files){
+        return res.status(400).json({
+            result: "missing confirm itinerary",
+            success: false
+        })
+    }
+
+    const file = req.files.pdf
+    const params = {
+        Bucket: 'comfirmitineraries',
+        Key: key,
+        Body: file.data,
+    };
+
     const result = new Promise((resolve, reject)=> {
         if(data.customer_id&&data.amount_payable&&data.advance_amount&&data.tasks.length!=0&&data.bookables&&data.tour_id&&data.start_date&&data.end_date&&data.dep_id&&data.branch_id){
             const string = String(data.bookables)
-            connection.query(`insert into bookings (customer_id, user_id, amount_payable, advance_amount, bookables, tour_id, start_date, end_date, dep_id, branch_id) values (${data.customer_id}, '${res.locals.uid}', ${data.amount_payable}, ${data.advance_amount}, '${string}', ${data.tour_id}, '${data.start_date}', '${data.end_date}', ${data.dep_id}, ${data.branch_id}) returning booking_id;`, (err, response)=> {
-                if(err){
-                    reject()
+            s3.upload(params, function (err) {
+                if (err) {
+                  reject()
                 }
-                const booking_id = response.rows[0].booking_id;
-                data.tasks.forEach((day)=> {
-                    connection.query(`insert into days(booking_id) values (${booking_id}) returning day_id;`, (err, dayres)=> {
-                        if(err){
-                            reject()
-                        }
-                        const day_id = dayres.rows[0].day_id;
-                        day.forEach(task=> {
-                            connection.query(`insert into tasks (day_id, task) values (${day_id}, '${task}');`, (err)=> {
-                                if(err){
-                                    reject()
-                                }
-                                resolve()
+                connection.query(`insert into bookings (customer_id, user_id, amount_payable, advance_amount, bookables, tour_id, start_date, end_date, dep_id, branch_id, confirm_itinerary) values (${data.customer_id}, '${res.locals.uid}', ${data.amount_payable}, ${data.advance_amount}, '${string}', ${data.tour_id}, '${data.start_date}', '${data.end_date}', ${data.dep_id}, ${data.branch_id}, '${key}') returning booking_id;`, (err, response)=> {
+                    if(err){
+                        reject()
+                    }
+                    const booking_id = response.rows[0].booking_id;
+                    data.tasks.forEach((day)=> {
+                        connection.query(`insert into days(booking_id) values (${booking_id}) returning day_id;`, (err, dayres)=> {
+                            if(err){
+                                reject()
+                            }
+                            const day_id = dayres.rows[0].day_id;
+                            day.forEach(task=> {
+                                connection.query(`insert into tasks (day_id, task) values (${day_id}, '${task}');`, (err)=> {
+                                    if(err){
+                                        reject()
+                                    }
+                                    resolve()
+                                })
                             })
                         })
                     })
+                    resolve()
                 })
-                resolve()
             })
         }
         else{
