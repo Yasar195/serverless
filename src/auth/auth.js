@@ -185,7 +185,13 @@ router.get('/dash', (req, res)=> {
                                     reject()
                                 }
                                 data.follow_ups = folres.rows[0].count
-                                resolve(data)
+                                connection.query(`select count(*) from bookings where dep_id=${req.query.dep_id};`, (err, bookres)=> {
+                                    if(err){
+                                        reject()
+                                    }
+                                    data.bookings = bookres.rows[0].count
+                                    resolve(data)
+                                })
                             })
                         })
                     })
