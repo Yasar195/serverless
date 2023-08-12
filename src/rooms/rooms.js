@@ -90,10 +90,23 @@ router.get('/', (req, res)=> {
 //     })
 // })
 
+function isArrayContainingNumbers(arr) {
+    for (let element of arr) {
+      if (typeof element !== 'number') {
+        return false;
+      }
+    }
+    return true;
+}
+
 router.post('/available', (req, res)=> {
     const data = req.body
     const response = []
     const result = new Promise((resolve, reject)=> {
+        const bool = isArrayContainingNumbers(data.room_category)
+        if(!bool){
+            return reject()
+        }
         if(data.tour_id&&data.room_category.length !==0&&data.room_type.length !== 0){
             data.room_category.forEach((cat, index)=> {
                 data.room_type.forEach((type, ind) => {
@@ -115,14 +128,13 @@ router.post('/available', (req, res)=> {
     })
     
     result.then((result)=> {
-        res.status(200).json({
+        return res.status(200).json({
             result: result,
             success: true
         })
     })
-    .catch((err)=> {
-        console.log(err)
-        res.status(500).json({
+    .catch(()=> {
+        return res.status(500).json({
             result: 'available room fetch failed',
             success: false
         })

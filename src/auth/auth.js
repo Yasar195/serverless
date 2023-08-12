@@ -60,13 +60,13 @@ router.get('/', async (req, res) => {
         });
         data[0].dep_image = depurl
         data[0].profile_image = prourl
-        res.status(200).json({
+        return res.status(200).json({
             result: data,
             success: true
         })
     })
     .catch(() => {
-        res.status(500).json({
+        return res.status(500).json({
             result: 'user authentication failed',
             success: false
         })
