@@ -174,7 +174,7 @@ router.post('/cat', (req, res)=> {
 router.get('/cat', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id){
-            connection.query(`select * from room_cate where dep_id=${req.query.dep_id};`, (err, result)=> {
+            connection.query(`select cat_id::integer AS cat_id, cat_name from room_cate where dep_id=${req.query.dep_id};`, (err, result)=> {
                 if(err){
                     reject()
                 }
