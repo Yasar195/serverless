@@ -92,10 +92,15 @@ router.put('/', async (req, res)=> {
     })
 })
 
+const generateCode = (depcode, branchcode) => {
+    return `${depcode}${Math.floor(100000 + Math.random() * 900000)}${branchcode}`
+}
+
 router.post('/signup', (req, res)=> {
     const data = req.body
     const key = `${req.body.user_id}.jpg`
     const image = req.files.image
+    console.log(data)
     const params = {
         Bucket: 'triprofilephotos',
         Key: key,
@@ -103,16 +108,28 @@ router.post('/signup', (req, res)=> {
     };
     const user = new Promise((resolve, reject) => {
         if(image&&data.user_name&&data.user_id&&data.user_type&&data.user_email&&data.dep_id&&data.branch_id && data.phone && key){
-            s3.upload(params, function (err) {
-                if (err) {
+            connection.query(`select dep_code from departments where dep_id=${data.dep_id};`, (err, depresponse)=> {
+                if(err){
                     reject()
                 }
-                connection.query(`insert into users (user_id, user_name, user_type, user_email, dep_id, branch_id, registered, user_phone, profile_key) values('${data.user_id}', '${data.user_name}', '${data.user_type}', '${data.user_email}', ${data.dep_id}, ${data.branch_id}, true, '${data.phone}', '${key}');`,(err)=> {
+                const dep_code = depresponse.rows[0].dep_code
+                connection.query(`select branch_code from branches where branch_id=${data.branch_id};`, (err, braresponse)=> {
                     if(err){
-                        console.log(err)
                         reject()
                     }
-                    resolve()
+                    const branch_code = braresponse.rows[0].branch_code
+                    const code = generateCode(dep_code, branch_code)
+                    s3.upload(params, function (err) {
+                        if (err) {
+                            reject()
+                        }
+                        connection.query(`insert into users (user_id, user_name, user_type, user_email, dep_id, branch_id, registered, user_phone, profile_key, user_code) values('${data.user_id}', '${data.user_name}', '${data.user_type}', '${data.user_email}', ${data.dep_id}, ${data.branch_id}, true, '${data.phone}', '${key}', '${code}');`,(err)=> {
+                            if(err){
+                                reject()
+                            }
+                            resolve()
+                        })
+                    })
                 })
             })
         }
