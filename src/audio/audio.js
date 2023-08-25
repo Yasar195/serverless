@@ -15,9 +15,9 @@ router.post('/upload', (req, res)=> {
     }
 
     const file = req.files.audio;
-    const key = `${generateRandomString(10)}.mp3`
+    const key = `audios/${generateRandomString(10)}.mp3`
     const params = {
-        Bucket: 'customeraudios',
+        Bucket: 'tele-profile',
         Key: key,
         Body: file.data,
     };
@@ -94,7 +94,7 @@ router.get('/:id', (req, res)=> {
     audios.then((data)=> {
         data.forEach(element => {
             const params = {
-                Bucket: 'customeraudios',
+                Bucket: 'tele-profile',
                 Key: element.response_key,
             };
             const url = s3.getSignedUrl('getObject', params);

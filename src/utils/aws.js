@@ -8,10 +8,17 @@ let s3 = new AWS.S3({
     secretAccessKey: process.env.S3_SECRET_KEY
 })
 
+// let s3 = new AWS.S3({
+//     region: 'ap-south-1',
+//     accessKeyId: 'AKIAU2MNRVPBXQOO2G2Y',
+//     secretAccessKey: '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'
+// })
+
+
 // s3.putObject({
-//     Bucket: 'trippens',
-//     Key: 'ayra.png',
-//     Body: fs.readFileSync('ayra.png')
+//     Bucket: 'tele-profile',
+//     Key: 'profile/pg.jpg',
+//     Body: fs.readFileSync('./pg.jpg')
 // }, (err, response) => {
 //     if(err){
 //         console.log(err)

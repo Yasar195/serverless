@@ -49,12 +49,12 @@ router.get('/', async (req, res) => {
     })
     user.then(async (data)=> {
         const depurl = s3.getSignedUrl('getObject', {
-            Bucket: 'trippens',
+            Bucket: 'tele-profile',
             Key: data[0].dep_image,
             Expires: 60 * 60
         });
         const prourl = s3.getSignedUrl('getObject', {
-            Bucket: 'triprofilephotos',
+            Bucket: 'tele-profile',
             Key: data[0].profile_key,
             Expires: 60 * 60
         });
@@ -75,7 +75,6 @@ router.get('/', async (req, res) => {
 
 router.get('/admins', async (req, res)=> {
     const user = new Promise((resolve, reject) => {
-        console.log(res.locals.uid)
         connection.query(`select * from admins where admin_id='${res.locals.uid}';`, (err, result)=> {
             if(err){
                 reject()
@@ -192,7 +191,6 @@ router.get('/dash', (req, res)=> {
                                     data.bookings = bookres.rows[0].count
                                     connection.query(`select count(*) from bookings where dep_id=${req.query.dep_id} and payment_complete=true;`, (err, bookres)=> {
                                         if(err){
-                                            console.log(err)
                                             reject()
                                         }
                                         data.completed = bookres.rows[0].count

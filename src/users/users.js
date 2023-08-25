@@ -98,11 +98,11 @@ const generateCode = (depcode, branchcode) => {
 
 router.post('/signup', (req, res)=> {
     const data = req.body
-    const key = `${req.body.user_id}.jpg`
+    const key = `profile/${req.body.user_id}.jpg`
     const image = req.files.image
     console.log(data)
     const params = {
-        Bucket: 'triprofilephotos',
+        Bucket: 'tele-profile',
         Key: key,
         Body: image.data,
     };

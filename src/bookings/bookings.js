@@ -6,7 +6,7 @@ const s3 = require('../utils/aws')
 router.post('/', (req, res)=> {
     const data = JSON.parse(req.body.data);
 
-    const key = `${generateRandomString(10)}.pdf`
+    const key = `itineraries/${generateRandomString(10)}.pdf`
     if(!req.files){
         return res.status(400).json({
             result: "missing confirm itinerary",
@@ -16,7 +16,7 @@ router.post('/', (req, res)=> {
 
     const file = req.files.pdf
     const params = {
-        Bucket: 'comfirmitineraries',
+        Bucket: 'tele-profile',
         Key: key,
         Body: file.data,
     };
@@ -170,7 +170,6 @@ router.get('/service', (req, res)=> {
         if(req.query.dep_id){
             connection.query(`select bookings.booking_id, bookings.start_date, bookings.end_date ,customers.customer_name, customers.customer_phone from bookings join customers on bookings.customer_id=customers.customer_id where bookings.dep_id=${req.query.dep_id} and bookings.status!='Completed' order by booking_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
                 if(err){
-                    console.log(err)
                     reject()
                 }
                 resolve(response.rows)

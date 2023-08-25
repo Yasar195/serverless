@@ -1,8 +1,6 @@
-FROM nodejs:18
-WORKDIR  /
+FROM node:latest
 COPY package.json /
 RUN npm install
 COPY . /
-ENV PORT=8080
-EXPOSE 8080
+WORKDIR  /
 CMD ["npm", "start"]
