@@ -1,21 +1,6 @@
 const { Pool, Client } = require('pg')
 require('dotenv').config()
 
-// const pool = new Pool({
-//     user: process.env.DATABASE_USER,
-//     password: process.env.DATABASE_PASSWORD,
-//     host: process.env.DATABASE_HOST,
-//     port: process.env.DATABASE_PORT,
-//     database: process.env.DATABASE_NAME,
-//     max: 5,
-//     connectionTimeoutMillis: 20000,
-//     idleTimeoutMillis: 20000,
-//     allowExitOnIdle: false,
-//     ssl: {
-//         rejectUnauthorized: false
-//     }
-// })
-
 const pool = new Pool({
     user: 'teleadmin',
     password: 'rK3QGqgSy2GT8XMIqEX4',
@@ -43,30 +28,6 @@ const pool = new Pool({
 //     console.log(rows)
 // }
 
-
-// connect()
-
-// let client = null;
-
-// let p = new Promise((resolve, reject) => {
-//     client = new Client({
-//         user: process.env.DATABASE_USER,
-//         password: process.env.DATABASE_PASSWORD,
-//         host: process.env.DATABASE_HOST,
-//         port: process.env.DATABASE_PORT,
-//         database: process.env.DATABASE_NAME,
-//         ssl: {
-//             rejectUnauthorized: false
-//         }
-//     })
-//     if(client !== ""){
-//         resolve(client);
-//     }
-//     else{
-//         reject();
-//     }
-// })
-
 // p.then((client)=> {
 //     client.connect()
 // })
@@ -79,4 +40,3 @@ const pool = new Pool({
 // pool.on('remove', ()=> console.log('removed'))
 
 module.exports = pool;
-// module.exports = pool;
