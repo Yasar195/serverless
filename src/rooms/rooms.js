@@ -90,36 +90,33 @@ router.get('/', (req, res)=> {
 //     })
 // })
 
-function isArrayContainingNumbers(arr) {
-    for (let element of arr) {
-      if (typeof element !== 'number') {
-        return false;
-      }
-    }
-    return true;
-}
-
-router.post('/available', (req, res)=> {
+router.post('/available', async (req, res)=> {
     const data = req.body
-    const response = []
+    let cate = ``
+    let type = ``
     const result = new Promise((resolve, reject)=> {
-        const bool = isArrayContainingNumbers(data.room_category)
-        if(!bool){
-            return reject()
-        }
         if(data.tour_id&&data.room_category.length !==0&&data.room_type.length !== 0){
             data.room_category.forEach((cat, index)=> {
-                data.room_type.forEach((type, ind) => {
-                    connection.query(`select * from rooms where tour_id=${data.tour_id} and room_category=${cat} and room_type='${type}';`, (err, result)=> {
-                        if(err){
-                            reject()
-                        }
-                        response.push(...result.rows)
-                        if(data.room_category.length-1===index&&data.room_type.length-1===ind){
-                            resolve(response)
-                        }
-                    })
-                })
+                if(index !== data.room_category.length-1){
+                    cate += `${cat}, `
+                }
+                else{
+                    cate += `${cat}`
+                }
+            })
+            data.room_type.forEach((cat, index)=> {
+                if(index !== data.room_type.length-1){
+                    type += `'${cat}', `
+                }
+                else{
+                    type += `'${cat}'`
+                }
+            })
+            connection.query(`select * from rooms where tour_id=${data.tour_id} and (room_category IN (${cate})) and (room_type IN (${type}));`, (err, result)=> {
+                if(err){
+                    reject()
+                }
+                resolve(result.rows)
             })
         }
         else{
