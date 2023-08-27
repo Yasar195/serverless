@@ -61,51 +61,24 @@ router.get('/', (req, res)=> {
     })
 })
 
-// router.post('/booking', (req, res)=> {
-//     const data = req.body
-//     const result = new Promise((resolve, reject)=> {
-//         if(data.vehicle_id&&data.start_date&&data.end_date){
-//             connection.query(`insert into vehicle_bookings (vehicle_id, start_date, end_date) values (${data.vehicle_id}, '${data.start_date}', '${data.end_date}');`, (err)=> {
-//                 if(err){
-//                     reject()
-//                 }
-//                 resolve()
-//             })
-//         }
-//         else{
-//             reject()
-//         }
-//     })
-    
-//     result.then(()=> {
-//         res.status(200).json({
-//             result: 'vehicle booked successfully',
-//             success: true
-//         })
-//     })
-//     .catch(()=> {
-//         res.status(500).json({
-//             result: 'vehicle booking failed',
-//             success: false
-//         })
-//     })
-// })
-
 router.post('/available', (req, res)=> {
     const data = req.body
-    const response = []
+    let cate = ``
     const result = new Promise((resolve, reject)=> {
         if(data.tour_id&&data.vehicle_category.length!==0){
             data.vehicle_category.forEach((cat, index)=> {
-                connection.query(`select * from vehicles where tour_id=${data.tour_id} and vehicle_category=${cat};`, (err, result)=> {
-                    if(err){
-                        reject()
-                    }
-                    response.push(...result.rows)
-                    if(data.vehicle_category.length-1 === index){
-                        resolve(response)
-                    }
-                })
+                if(index !== data.vehicle_category.length-1){
+                    cate += `${cat}, `
+                }
+                else{
+                    cate += `${cat}`
+                }
+            })
+            connection.query(`select * from vehicles where tour_id=${data.tour_id} and (vehicle_category IN (${cate}));`, (err, result)=> {
+                if(err){
+                    reject()
+                }
+                resolve(result.rows)
             })
         }
         else{
