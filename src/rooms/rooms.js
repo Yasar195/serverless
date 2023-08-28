@@ -96,14 +96,7 @@ router.post('/available', async (req, res)=> {
     let type = ``
     const result = new Promise((resolve, reject)=> {
         if(data.tour_id&&data.room_category.length !==0&&data.room_type.length !== 0){
-            data.room_category.forEach((cat, index)=> {
-                if(index !== data.room_category.length-1){
-                    cate += `${cat}, `
-                }
-                else{
-                    cate += `${cat}`
-                }
-            })
+            cate = String(data.room_category)
             data.room_type.forEach((cat, index)=> {
                 if(index !== data.room_type.length-1){
                     type += `'${cat}', `
