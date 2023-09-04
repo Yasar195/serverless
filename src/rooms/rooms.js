@@ -105,7 +105,7 @@ router.post('/available', async (req, res)=> {
                     type += `'${cat}'`
                 }
             })
-            connection.query(`select * from rooms where tour_id=${data.tour_id} and (room_category IN (${cate})) and (room_type IN (${type}));`, (err, result)=> {
+            connection.query(`select * from rooms join room_cate on rooms.room_category=room_cate.cat_id where tour_id=${data.tour_id} and (room_category IN (${cate})) and (room_type IN (${type}));`, (err, result)=> {
                 if(err){
                     reject()
                 }

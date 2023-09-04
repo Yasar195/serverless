@@ -67,8 +67,9 @@ router.post('/available', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(data.tour_id&&data.vehicle_category.length!==0){
             cate = String(data.vehicle_category)
-            connection.query(`select * from vehicles where tour_id=${data.tour_id} and (vehicle_category IN (${cate}));`, (err, result)=> {
+            connection.query(`select * from vehicles join vehicle_cate on vehicles.vehicle_category=vehicle_cate.cat_id where tour_id=${data.tour_id} and (vehicle_category IN (${cate}));`, (err, result)=> {
                 if(err){
+                    console.log(err)
                     reject()
                 }
                 resolve(result.rows)

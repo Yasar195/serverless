@@ -8,7 +8,6 @@ router.get('/', async (req, res)=> {
         if(req.query.dep_id){
             connection.query(`select * from tour where dep_id=${req.query.dep_id};`, (err, response)=> {
                 if(err){
-                    console.log(err)
                     reject()
                 }
                 resolve(response.rows)
@@ -125,21 +124,19 @@ router.post('/createtours', async (req, res)=> {
     const file = req.files;
     const result = new Promise((resolve, reject)=> {
         if(data.dep_id&&data.tour_name&&data.tour_des&&data.tour_code){
-            connection.query(`insert into tour (dep_id, tour_name, tour_des, tour_code${file? ', tour_pdf': ''}) values (${data.dep_id}, '${data.tour_name}', '${data.tour_des}', '${data.tour_code}'${file? `, '${data.tour_code}.pdf'`: ''});`, (err)=> {
+            connection.query(`insert into tour (dep_id, tour_name, tour_des, tour_code${file? ', tour_pdf': ''}) values (${data.dep_id}, '${data.tour_name}', '${data.tour_des}', '${data.tour_code}'${file? `, 'tours/${data.tour_code}.pdf'`: ''});`, (err)=> {
                 if(err){
-                    console.log(err)
                     reject()
                 }
                 if(file){
-                    const key = `${data.tour_code}.pdf`
+                    const key = `tours/${data.tour_code}.pdf`
                     const params = {
-                        Bucket: 'fixeditinerary',
+                        Bucket: 'tele-profile',
                         Key: key,
                         Body: file.pdf.data,
                     };
                     s3.upload(params, function (err) {
                         if (err) {
-                            console.log(err)
                             reject()
                         }
                         resolve()
@@ -194,6 +191,96 @@ router.post('/createplace', async (req, res)=> {
     .catch(()=> {
         res.status(500).json({
             result: "place creation failed",
+            success: false
+        })
+    })
+})
+
+router.put('/createplace', async (req, res)=> {
+    const data = req.body;
+    const result = new Promise((resolve, reject)=> {
+        if(data.place_id&&data.place_name&&data.place_des){
+            connection.query(`update place set place_name='${data.place_name}', place_des='${data.place_des}' where place_id=${data.place_id};`, (err)=> {
+                if(err){
+                    reject()
+                }
+                resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: "place updated successfully",
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "place updation failed",
+            success: false
+        })
+    })
+})
+
+router.put('/createaddons', async (req, res)=> {
+    const data = req.body;
+    const result = new Promise((resolve, reject)=> {
+        if(data.addon_id&&data.addon_name&&data.addon_des){
+            connection.query(`update addon set addon_name='${data.addon_name}', addon_des='${data.addon_des}' where addon_id=${data.addon_id};`, (err)=> {
+                if(err){
+                    reject()
+                }
+                resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: "addon updated successfully",
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "addon updation failed",
+            success: false
+        })
+    })
+})
+
+router.put('/createactivity', async (req, res)=> {
+    const data = req.body;
+    const result = new Promise((resolve, reject)=> {
+        if(data.activity_id&&data.activity_name&&data.activity_des&&data.activity_price){
+            connection.query(`update activity set activity_name='${data.activity_name}', activity_des='${data.activity_des}', activity_price=${data.activity_price} where activity_id=${data.activity_id};`, (err)=> {
+                if(err){
+                    reject()
+                }
+                resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: "activity updated successfully",
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "activity updation failed",
             success: false
         })
     })

@@ -1,6 +1,7 @@
-FROM node:latest
-COPY package.json /
+FROM public.ecr.aws/docker/library/node:lts-hydrogen
+WORKDIR /app
+COPY package.json /app
 RUN npm install
-COPY . /
-WORKDIR  /
+COPY . /app
+EXPOSE 8080
 CMD ["npm", "start"]
