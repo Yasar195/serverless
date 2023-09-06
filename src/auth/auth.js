@@ -34,9 +34,8 @@ const authenticate = async (req, res, next) => {
 
 router.get('/', async (req, res) => {
     const user = new Promise((resolve, reject) => {
-        connection.query(`select users.user_id, users.user_name, users.profile_key, users.user_type, users.user_email, users.user_code, users.registered, users.dep_id, users.branch_id, departments.dep_name, departments.dep_image, departments.dep_color, branches.branch_name from users join departments on users.dep_id = departments.dep_id join branches on users.branch_id = branches.branch_id where users.user_id='${res.locals.uid}';`, (err, result)=> {
+        connection.query(`select users.user_id, users.user_name, users.profile_key, users.user_type, users.user_email, users.user_code, users.registered, users.dep_id, users.branch_id, departments.dep_name, departments.dep_image, departments.dep_color, branches.branch_name from users join departments on users.dep_id = departments.dep_id join dep_branch on users.branch_id = dep_branch.id join branches on dep_branch.branch_id=branches.branch_id where users.user_id='${res.locals.uid}';`, (err, result)=> {
             if(err){
-                
                 reject()
             }
             const registered = result.rows[0].registered
