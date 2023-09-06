@@ -60,36 +60,6 @@ router.get('/', (req, res)=> {
     })
 })
 
-// router.post('/booking', (req, res)=> {
-//     const data = req.body
-//     const result = new Promise((resolve, reject)=> {
-//         if(data.room_id&&data.start_date&&data.end_date){
-//             connection.query(`insert into room_bookings (room_id, start_date, end_date) values (${data.room_id}, '${data.start_date}', '${data.end_date}');`, (err)=> {
-//                 if(err){
-//                     reject()
-//                 }
-//                 resolve()
-//             })
-//         }
-//         else{
-//             reject()
-//         }
-//     })
-    
-//     result.then(()=> {
-//         res.status(200).json({
-//             result: 'room booked successfully',
-//             success: true
-//         })
-//     })
-//     .catch(()=> {
-//         res.status(500).json({
-//             result: 'room booking failed',
-//             success: false
-//         })
-//     })
-// })
-
 router.post('/available', async (req, res)=> {
     const data = req.body
     let cate = ``
