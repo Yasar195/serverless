@@ -4,8 +4,8 @@ const s3 = require('../utils/aws')
 
 router.get('/', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
-        if(req.query.dep_id){
-            connection.query(`SELECT * FROM customers JOIN users ON customers.user_id = users.user_id JOIN departments ON customers.dep_id = departments.dep_id JOIN branches ON customers.branch_id = branches.branch_id where customers.dep_id=${req.query.dep_id} ${req.query.name? `and lower(customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.progress? `and customer_progress='${req.query.progress}'`: ''} ${req.query.id? `and customer_id=${req.query.id} or cid=${req.query.id}`: ''} ${req.query.phone? `and customer_phone like '%${req.query.phone}%'`: ''} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, result)=> {
+        if(req.query.dep_id&&req.query.branch_id){
+            connection.query(`SELECT * FROM customers JOIN users ON customers.user_id = users.user_id JOIN departments ON customers.dep_id = departments.dep_id JOIN dep_branch ON customers.branch_id = dep_branch.id join branches on dep_branch.branch_id=branches.branch_id where customers.dep_id=${req.query.dep_id} and customers.branch_id=${req.query.branch_id} ${req.query.name? `and lower(customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.progress? `and customer_progress='${req.query.progress}'`: ''} ${req.query.id? `and customer_id=${req.query.id} or cid=${req.query.id}`: ''} ${req.query.phone? `and customer_phone like '%${req.query.phone}%'`: ''} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, result)=> {
                 if(err){
                     console.log(err)
                     reject()
@@ -153,9 +153,10 @@ router.post('/signup', (req, res)=> {
 
 router.get('/freshleads', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
-        if(req.query.dep_id){
-            connection.query(`select * from customers where assigned=false and customer_progress='Not started'and customer_progress!='Booked' and dep_id=${req.query.dep_id} and booked=false ${req.query.name? `and lower(customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.progress? `and customer_progress='${req.query.progress}'`: ''} ${req.query.id? `and customer_id=${req.query.id} or cid=${req.query.id}`: ''} ${req.query.phone? `and customer_phone like '%${req.query.phone}%'`: ''} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};;`, (err, response) => {
+        if(req.query.dep_id&&req.query.branch_id){
+            connection.query(`select * from customers where assigned=false and customer_progress='Not started' and customer_progress!='Booked' and dep_id=${req.query.dep_id} and branch_id=${req.query.branch_id} and booked=false ${req.query.name? `and lower(customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.progress? `and customer_progress='${req.query.progress}'`: ''} ${req.query.id? `and customer_id=${req.query.id} or cid=${req.query.id}`: ''} ${req.query.phone? `and customer_phone like '%${req.query.phone}%'`: ''} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};;`, (err, response) => {
                 if(err){
+                    console.log(err)
                     reject()
                 }
                 resolve(response.rows)
@@ -182,8 +183,8 @@ router.get('/freshleads', async (req, res)=> {
 
 router.get('/oldleads', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
-        if(req.query.dep_id){
-            connection.query(`select * from customers where assigned=false and customer_progress!='Not started' and customer_progress!='Booked' and dep_id=${req.query.dep_id} and booked=false ${req.query.name? `and lower(customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.progress? `and customer_progress='${req.query.progress}'`: ''} ${req.query.id? `and customer_id=${req.query.id} or cid=${req.query.id}`: ''} ${req.query.phone? `and customer_phone like '%${req.query.phone}%'`: ''} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response) => {
+        if(req.query.dep_id&&req.query.branch_id){
+            connection.query(`select * from customers where assigned=false and customer_progress!='Not started' and customer_progress!='Booked' and dep_id=${req.query.dep_id} and branch_id=${req.query.branch_id} and booked=false ${req.query.name? `and lower(customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.progress? `and customer_progress='${req.query.progress}'`: ''} ${req.query.id? `and customer_id=${req.query.id} or cid=${req.query.id}`: ''} ${req.query.phone? `and customer_phone like '%${req.query.phone}%'`: ''} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response) => {
                 if(err){
                     reject()
                 }
