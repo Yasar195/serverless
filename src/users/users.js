@@ -100,7 +100,6 @@ router.post('/signup', (req, res)=> {
     const data = req.body
     const key = `profile/${req.body.user_id}.jpg`
     const image = req.files.image
-    console.log(data)
     const params = {
         Bucket: 'tele-profile',
         Key: key,
@@ -113,7 +112,7 @@ router.post('/signup', (req, res)=> {
                     reject()
                 }
                 const dep_code = depresponse.rows[0].dep_code
-                connection.query(`select branch_code from branches where branch_id=${data.branch_id};`, (err, braresponse)=> {
+                connection.query(`select branch_code from dep_branch where id=${data.branch_id};`, (err, braresponse)=> {
                     if(err){
                         reject()
                     }
@@ -138,7 +137,7 @@ router.post('/signup', (req, res)=> {
         }
     })
 
-    user.then((data)=> {
+    user.then(()=> {
         res.status(200).json({
             result: "user created successfully",
             success: true
