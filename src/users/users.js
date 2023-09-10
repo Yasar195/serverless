@@ -7,7 +7,6 @@ router.get('/', async (req, res)=> {
         if(req.query.dep_id&&req.query.branch_id){
             connection.query(`SELECT * FROM customers JOIN users ON customers.user_id = users.user_id JOIN departments ON customers.dep_id = departments.dep_id JOIN dep_branch ON customers.branch_id = dep_branch.id join branches on dep_branch.branch_id=branches.branch_id where customers.dep_id=${req.query.dep_id} and customers.branch_id=${req.query.branch_id} ${req.query.name? `and lower(customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.progress? `and customer_progress='${req.query.progress}'`: ''} ${req.query.id? `and customer_id=${req.query.id} or cid=${req.query.id}`: ''} ${req.query.phone? `and customer_phone like '%${req.query.phone}%'`: ''} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, result)=> {
                 if(err){
-                    console.log(err)
                     reject()
                 }
                 resolve(result.rows)
@@ -66,7 +65,7 @@ router.put('/', async (req, res)=> {
     const customer = req.body
     const upload = new Promise((resolve, reject)=> {
         if(customer.customer_id&&customer.customer_name && customer.customer_phone && customer.customer_vehicle && customer.customer_whatapp && customer.customer_progress && customer.customer_source && customer.customer_address && customer.customer_city && customer.customer_remarks && String(customer.customer_pax) && customer.customer_category){
-            connection.query(`update customers set customer_name='${customer.customer_name}', customer_phone='${customer.customer_phone}', customer_vehicle='${customer.customer_vehicle}', customer_whatsapp='${customer.customer_whatapp}', customer_progress='${customer.customer_progress}', customer_source='${customer.customer_source}', customer_address='${customer.customer_address}', customer_city='${customer.customer_city}', customer_remarks='${customer.customer_remarks}', customer_pax='${customer.customer_pax}', customer_category='${customer.customer_category}', booked=false, user_id='${res.locals.uid}' where customer_id=${customer.customer_id};`, (err)=> {
+            connection.query(`update customers set customer_name='${customer.customer_name}', customer_phone='${customer.customer_phone}', customer_vehicle='${customer.customer_vehicle}', customer_whatsapp='${customer.customer_whatapp}' ${customer.tour_code? `,tour_code='${customer.tour_code}'`: ''}, customer_progress='${customer.customer_progress}', customer_source='${customer.customer_source}', customer_address='${customer.customer_address}', customer_city='${customer.customer_city}', customer_remarks='${customer.customer_remarks}', customer_pax='${customer.customer_pax}', customer_category='${customer.customer_category}', booked=false, user_id='${res.locals.uid}' where customer_id=${customer.customer_id};`, (err)=> {
                 if(err){
                     reject()
                 }
@@ -204,58 +203,58 @@ router.get('/oldleads', async (req, res)=> {
     })
     .catch(()=> {
         res.status(500).json({
-            result: "fetching fresh leads failed",
+            result: "fetching old leads failed",
             success: false
         })
     })
 })
 
-router.get('/activity/:id', (req, res)=> {
-    const result = new Promise((resolve, reject)=> {
-        connection.query(`select * from user_activity where user_id='${req.params.id}';`, (err, response)=> {
-            if(err){
-                reject()
-            }
-            resolve(response.rows)
-        })
-    })
+// router.get('/activity/:id', (req, res)=> {
+//     const result = new Promise((resolve, reject)=> {
+//         connection.query(`select * from user_activity where user_id='${req.params.id}';`, (err, response)=> {
+//             if(err){
+//                 reject()
+//             }
+//             resolve(response.rows)
+//         })
+//     })
 
-    result.then((data)=> {
-        res.status(200).json({
-            result: data,
-            success: true
-        })
-    })
-    .catch(()=> {
-        res.status(500).json({
-            result: "fetching user activity failed",
-            success: false
-        })
-    })
-})
+//     result.then((data)=> {
+//         res.status(200).json({
+//             result: data,
+//             success: true
+//         })
+//     })
+//     .catch(()=> {
+//         res.status(500).json({
+//             result: "fetching user activity failed",
+//             success: false
+//         })
+//     })
+// })
 
-router.delete('/:id', (req, res)=> {
-    const result = new Promise((resolve, reject)=> {
-        connection.query(`DELETE FROM users WHERE user_id=${req.params.id}`, (err, response) => {
-            if(err){
-                reject("Deleting user data failed")
-            }
-            resolve("user data removed")
-        })
-    })
+// router.delete('/:id', (req, res)=> {
+//     const result = new Promise((resolve, reject)=> {
+//         connection.query(`DELETE FROM users WHERE user_id=${req.params.id}`, (err, response) => {
+//             if(err){
+//                 reject("Deleting user data failed")
+//             }
+//             resolve("user data removed")
+//         })
+//     })
 
-    result.then((message)=> {
-        res.status(200).json({
-            result: message,
-            success: true
-        })
-    })
-    .catch((message)=> {
-        res.status(400).json({
-            result: message,
-            success: false
-        })
-    })
-})
+//     result.then((message)=> {
+//         res.status(200).json({
+//             result: message,
+//             success: true
+//         })
+//     })
+//     .catch((message)=> {
+//         res.status(400).json({
+//             result: message,
+//             success: false
+//         })
+//     })
+// })
 
 module.exports = router;
