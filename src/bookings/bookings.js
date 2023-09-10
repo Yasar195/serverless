@@ -4,8 +4,6 @@ const { generateRandomString } = require('../utils/utils')
 const s3 = require('../utils/aws')
 
 router.post('/', (req, res)=> {
-    const data = JSON.parse(req.body.data);
-
     const key = `itineraries/${generateRandomString(10)}.pdf`
     if(!req.files){
         return res.status(400).json({
@@ -20,7 +18,7 @@ router.post('/', (req, res)=> {
         Key: key,
         Body: file.data,
     };
-
+    const data = JSON.parse(req.body.data)
     const result = new Promise((resolve, reject)=> {
         if(data.customer_id&&data.amount_payable&&data.advance_amount&&data.tasks.length!=0&&data.bookables&&data.tour_id&&data.start_date&&data.end_date&&data.dep_id&&data.branch_id){
             const string = String(data.bookables)
