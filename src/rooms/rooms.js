@@ -60,6 +60,36 @@ router.get('/', (req, res)=> {
     })
 })
 
+router.put('/', (req, res)=> {
+    const data = req.data
+    const result = new Promise((resolve, reject)=> {
+        if(data.room_id&&data.room_number&&data.room_building&&data.room_price){
+            connection.query(`update rooms set room_building='${data.room_building}', room_number=${data.room_number}, room_price=${data.room_price} where room_id=${data.room_id};`, (err)=> {
+                if(err){
+                    reject()
+                }
+                resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+    
+    result.then(()=> {
+        res.status(200).json({
+            result: 'room update success',
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'room updation failed',
+            success: false
+        })
+    })
+})
+
 router.post('/available', async (req, res)=> {
     const data = req.body
     let cate = ``

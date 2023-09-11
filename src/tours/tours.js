@@ -32,6 +32,35 @@ router.get('/', async (req, res)=> {
     })
 })
 
+router.delete('/places', async (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.place_id){
+            connection.query(`delete from place where place_id=${req.query.place_id};`, (err)=> {
+                if(err){
+                    reject()
+                }
+                resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: "place data deleted",
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "place data deletion failed",
+            success: false
+        })
+    })
+})
+
 router.get('/places', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.tour_id){
