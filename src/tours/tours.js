@@ -219,14 +219,14 @@ router.get('/activity', async (req, res)=> {
 router.post('/createtours', async (req, res)=> {
     const data = req.body;
     const file = req.files;
+    const key = `tours/${generateRandomString(10)}.pdf`
     const result = new Promise((resolve, reject)=> {
-        if(data.dep_id&&data.tour_name&&data.tour_des&&data.tour_code){
-            connection.query(`insert into tour (dep_id, tour_name, tour_des, tour_code${file? ', tour_pdf': ''}) values (${data.dep_id}, '${data.tour_name}', '${data.tour_des}', '${data.tour_code}'${file? `, 'tours/${data.tour_code}.pdf'`: ''});`, (err)=> {
+        if(data.dep_id&&data.tour_name&&data.tour_des){
+            connection.query(`insert into tour (dep_id, tour_name, tour_des${data.tour_code? ', tour_code':''}${file? ', tour_pdf': ''}) values (${data.dep_id}, '${data.tour_name}', '${data.tour_des}'${data.tour_code? `,'${data.tour_code}'`: ''}${file? `, '${key}'`: ''});`, (err)=> {
                 if(err){
                     reject()
                 }
-                if(file){
-                    const key = `tours/${data.tour_code}.pdf`
+                if(file){ 
                     const params = {
                         Bucket: 'tele-profile',
                         Key: key,
