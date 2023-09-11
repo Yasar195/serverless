@@ -64,7 +64,7 @@ router.post('/', async (req, res)=> {
 router.put('/', async (req, res)=> {
     const customer = req.body
     const upload = new Promise((resolve, reject)=> {
-        if(customer.customer_id&&customer.customer_name && customer.customer_phone && customer.customer_vehicle && customer.customer_whatapp && customer.customer_progress && customer.customer_source && customer.customer_address && customer.customer_city && customer.customer_remarks && String(customer.customer_pax) && customer.customer_category){
+        if(customer.customer_id&&customer.customer_name && customer.customer_phone && customer.customer_vehicle && customer.customer_whatapp && customer.customer_progress && customer.customer_source && customer.customer_address && customer.customer_city && customer.customer_remarks && String(customer.customer_pax) && customer.customer_category&&customer.tour){
             connection.query(`update customers set customer_name='${customer.customer_name}', customer_phone='${customer.customer_phone}', customer_vehicle='${customer.customer_vehicle}', customer_whatsapp='${customer.customer_whatapp}' ${customer.tour_code? `,tour_code='${customer.tour_code}'`: ''}, customer_progress='${customer.customer_progress}', customer_source='${customer.customer_source}', customer_address='${customer.customer_address}', customer_city='${customer.customer_city}', customer_remarks='${customer.customer_remarks}', customer_pax='${customer.customer_pax}', customer_category='${customer.customer_category}', booked=false, user_id='${res.locals.uid}', tour='${customer.tour}' where customer_id=${customer.customer_id};`, (err)=> {
                 if(err){
                     reject()
