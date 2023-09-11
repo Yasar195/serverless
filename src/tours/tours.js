@@ -35,11 +35,21 @@ router.get('/', async (req, res)=> {
 router.delete('/places', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.place_id){
-            connection.query(`delete from place where place_id=${req.query.place_id};`, (err)=> {
+            connection.query(`delete from activity where place_id=${req.query.place_id};`, (err)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                connection.query(`delete from addon where place_id=${req.query.place_id};`, (err)=> {
+                    if(err){
+                        reject()
+                    }
+                    connection.query(`delete from place where place_id=${req.query.place_id};`, (err)=> {
+                        if(err){
+                            reject()
+                        }
+                        resolve()
+                    })
+                })
             })
         }
         else{
@@ -85,6 +95,64 @@ router.get('/places', async (req, res)=> {
     .catch(()=> {
         res.status(500).json({
             result: "fetching places failed",
+            success: false
+        })
+    })
+})
+
+router.delete('/activities', async (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.activity_id){
+            connection.query(`delete from activity where activity_id=${req.query.activity_id};`, (err)=> {
+                if(err){
+                    reject()
+                }
+                resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: "activity data deleted",
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "activity data deletion failed",
+            success: false
+        })
+    })
+})
+
+router.delete('/addons', async (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.addon_id){
+            connection.query(`delete from addon where addon_id=${req.query.addon_id};`, (err)=> {
+                if(err){
+                    reject()
+                }
+                resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: "addon data deleted",
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "addon data deletion failed",
             success: false
         })
     })
