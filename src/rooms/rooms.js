@@ -161,6 +161,42 @@ router.post('/cat', (req, res)=> {
     })
 })
 
+router.post('/types', (req, res)=> {
+    const data = req.body
+    const tourstr = String(data.tour)
+    const catstr = String(data.cat)
+    const arrayres = []
+    const result = new Promise((resolve, reject)=> {
+        if(data.tour.length!==0&data.cat.length!==0){
+            connection.query(`select distinct room_type from rooms where (tour_id in (${tourstr})) and (room_category in (${catstr}));`, (err, result)=> {
+                if(err){
+                    reject()
+                }
+                result.rows.map((type)=> {
+                    arrayres.push(type.room_type)
+                })
+                resolve(arrayres)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+    
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'fetching room types failed',
+            success: false
+        })
+    })
+})
+
 router.get('/cat', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id){
