@@ -281,17 +281,13 @@ router.get('/staff/tasks', (req, res)=> {
                 if(err){
                     reject()
                 }
-                const result = []
-                response.rows.forEach(async (day, index) => {
-                    connection.query(`select * from tasks where day_id=${day.day_id};`, (err, taskres)=> {
-                        if(err){
-                            reject()
-                        }
-                        result.push([...taskres.rows])
-                        if(index === response.rows.length-1){
-                            resolve(result)
-                        }
-                    })
+                const idArray = []
+                response.rows.forEach((day)=> idArray.push(day.day_id))
+                connection.query(`select * from tasks where (day_id in (${String(idArray)}));`, (err, resp)=> {
+                    if(err){
+                        reject()
+                    }
+                    resolve(resp.rows)
                 })
             })
         }
