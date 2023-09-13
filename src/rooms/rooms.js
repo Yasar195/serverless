@@ -226,4 +226,34 @@ router.get('/cat', (req, res)=> {
     })
 })
 
+router.post('/roomcat', (req, res)=> {
+    const data = req.body;
+    const result = new Promise((resolve, reject)=> {
+        if(data.tour.length !== 0){
+            connection.query(`select distinct cat_id, cat_name from room_cate join rooms on rooms.room_category = room_cate.cat_id where (rooms.tour_id in (${String(data.tour)})) and (rooms.room_category in (room_cate.cat_id));`, (err, result)=> {
+                if(err){
+                    reject()
+                }
+                resolve(result.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+    
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'fetching room categories failed',
+            success: false
+        })
+    })
+})
+
 module.exports = router
