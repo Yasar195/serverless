@@ -152,4 +152,34 @@ router.get('/cat', (req, res)=> {
     })
 })
 
+router.post('/vehiclecat', (req, res)=> {
+    const data = req.body;
+    const result = new Promise((resolve, reject)=> {
+        if(data.tour.length !== 0){
+            connection.query(`select distinct cat_id, cat_name from vehicle_cate join vehicles on vehicles.vehicle_category = vehicle_cate.cat_id where (vehicles.tour_id in (${String(data.tour)})) and (vehicles.vehicle_category in (vehicle_cate.cat_id));`, (err, result)=> {
+                if(err){
+                    reject()
+                }
+                resolve(result.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+    
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'fetching vehicle categories failed',
+            success: false
+        })
+    })
+})
+
 module.exports = router
