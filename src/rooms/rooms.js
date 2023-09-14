@@ -9,7 +9,9 @@ router.post('/', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -38,7 +40,9 @@ router.get('/', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(result.rows)
+                else{
+                    resolve(result.rows)
+                }
             })
         }
         else{
@@ -68,7 +72,9 @@ router.put('/', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -109,7 +115,9 @@ router.post('/available', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(result.rows)
+                else{
+                    resolve(result.rows)
+                }
             })
         }
         else{
@@ -139,7 +147,9 @@ router.post('/cat', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -172,10 +182,12 @@ router.post('/types', (req, res)=> {
                 if(err){
                     reject()
                 }
-                result.rows.map((type)=> {
-                    arrayres.push(type.room_type)
-                })
-                resolve(arrayres)
+                else{
+                    result.rows.map((type)=> {
+                        arrayres.push(type.room_type)
+                    })
+                    resolve(arrayres)
+                }
             })
         }
         else{
@@ -204,7 +216,9 @@ router.get('/cat', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(result.rows)
+                else{
+                    resolve(result.rows)
+                }
             })
         }
         else{
@@ -234,7 +248,9 @@ router.post('/roomcat', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(result.rows)
+                else{
+                    resolve(result.rows)
+                }
             })
         }
         else{

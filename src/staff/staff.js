@@ -8,7 +8,9 @@ router.get('/', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(result.rows)
+                else{
+                    resolve(result.rows)
+                }
             })
         }
         else{
@@ -36,7 +38,9 @@ router.get('/all', (req, res)=> {
             if(err){
                 reject()
             }
-            resolve(result.rows)
+            else{
+                resolve(result.rows)
+            }
         })
     })
 

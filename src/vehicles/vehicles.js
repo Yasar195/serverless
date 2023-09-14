@@ -9,7 +9,9 @@ router.post('/', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -38,7 +40,9 @@ router.get('/', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(result.rows)
+                else{
+                    resolve(result.rows)
+                }
             })
         }
         else{
@@ -68,10 +72,11 @@ router.post('/available', (req, res)=> {
             cate = String(data.vehicle_category)
             connection.query(`select * from vehicles join vehicle_cate on vehicles.vehicle_category=vehicle_cate.cat_id where tour_id=${data.tour_id} and (vehicle_category IN (${cate}));`, (err, result)=> {
                 if(err){
-                    console.log(err)
                     reject()
                 }
-                resolve(result.rows)
+                else{
+                    resolve(result.rows)
+                }
             })
         }
         else{
@@ -101,7 +106,9 @@ router.post('/cat', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -130,7 +137,9 @@ router.get('/cat', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(result.rows)
+                else{
+                    resolve(result.rows)
+                }
             })
         }
         else{
@@ -160,7 +169,9 @@ router.post('/vehiclecat', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(result.rows)
+                else{
+                    resolve(result.rows)
+                }
             })
         }
         else{
@@ -169,13 +180,13 @@ router.post('/vehiclecat', (req, res)=> {
     })
     
     result.then((data)=> {
-        res.status(200).json({
+        return res.status(200).json({
             result: data,
             success: true
         })
     })
     .catch(()=> {
-        res.status(500).json({
+        return res.status(500).json({
             result: 'fetching vehicle categories failed',
             success: false
         })

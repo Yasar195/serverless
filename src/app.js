@@ -42,7 +42,9 @@ app.post('/application/users', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{

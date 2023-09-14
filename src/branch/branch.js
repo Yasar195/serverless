@@ -5,10 +5,7 @@ router.get('/', async (req, res)=> {
     const branches = new Promise((resolve, reject) => {
         if(req.query.dep_id){
             connection.query(`select branches.branch_name, dep_branch.branch_address from dep_branch join branches on dep_branch.branch_id = branches.branch_id where dep_branch.dep_id=${req.query.dep_id};`,(err, response)=> {
-                if(err){
-                    reject()
-                }
-                resolve(response.rows)
+                err? reject(): resolve(response.rows)
             })
         }
         else{
@@ -33,10 +30,7 @@ router.get('/', async (req, res)=> {
 router.get('/list', (req, res)=> {
     const branch = new Promise((resolve, reject) => {
         connection.query(`select * from branches;`,(err, response)=> {
-            if(err){
-                reject()
-            }
-            resolve(response.rows)
+            err? reject(): resolve(response.rows)
         })
     })
 
@@ -57,10 +51,7 @@ router.get('/list', (req, res)=> {
 router.get('/list/:id', (req, res)=> {
     const branch = new Promise((resolve, reject) => {
         connection.query(`select * from dep_branch where dep_id= ${req.params.id};`,(err, response)=> {
-            if(err){
-                reject()
-            }
-            resolve(response.rows)
+            err? reject(): resolve(response.rows)
         })
     })
 
@@ -81,10 +72,7 @@ router.get('/list/:id', (req, res)=> {
 router.get('/:id', async (req, res)=> {
     const branch = new Promise((resolve, reject) => {
         connection.query(`select * from branches where branch_id= ${req.params.id};`,(err, response)=> {
-            if(err){
-                reject()
-            }
-            resolve(response.rows)
+            err? reject(): resolve(response.rows)
         })
     })
 

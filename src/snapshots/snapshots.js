@@ -10,7 +10,9 @@ router.post('/', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -39,7 +41,9 @@ router.get('/', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(result.rows)
+                else{
+                    resolve(result.rows)
+                }
             })
         }
         else{
@@ -67,7 +71,9 @@ router.get('/:id', (req, res)=> {
             if(err){
                 reject()
             }
-            resolve(result.rows)
+            else{
+                resolve(result.rows)
+            }
         })
     })
     

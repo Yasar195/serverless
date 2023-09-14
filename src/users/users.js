@@ -9,7 +9,9 @@ router.get('/', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(result.rows)
+                else{
+                    resolve(result.rows)
+                }
             })
         }
         else{
@@ -39,7 +41,9 @@ router.post('/', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -69,7 +73,9 @@ router.put('/', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -110,25 +116,33 @@ router.post('/signup', (req, res)=> {
                 if(err){
                     reject()
                 }
-                const dep_code = depresponse.rows[0].dep_code
-                connection.query(`select branch_code from dep_branch where id=${data.branch_id};`, (err, braresponse)=> {
-                    if(err){
-                        reject()
-                    }
-                    const branch_code = braresponse.rows[0].branch_code
-                    const code = generateCode(dep_code, branch_code)
-                    s3.upload(params, function (err) {
-                        if (err) {
+                else{
+                    const dep_code = depresponse.rows[0].dep_code
+                    connection.query(`select branch_code from dep_branch where id=${data.branch_id};`, (err, braresponse)=> {
+                        if(err){
                             reject()
                         }
-                        connection.query(`insert into users (user_id, user_name, user_type, user_email, dep_id, branch_id, registered, user_phone, profile_key, user_code) values('${data.user_id}', '${data.user_name}', '${data.user_type}', '${data.user_email}', ${data.dep_id}, ${data.branch_id}, true, '${data.phone}', '${key}', '${code}');`,(err)=> {
-                            if(err){
-                                reject()
-                            }
-                            resolve()
-                        })
+                        else{
+                            const branch_code = braresponse.rows[0].branch_code
+                            const code = generateCode(dep_code, branch_code)
+                            s3.upload(params, function (err) {
+                                if (err) {
+                                    reject()
+                                }
+                                else{
+                                    connection.query(`insert into users (user_id, user_name, user_type, user_email, dep_id, branch_id, registered, user_phone, profile_key, user_code) values('${data.user_id}', '${data.user_name}', '${data.user_type}', '${data.user_email}', ${data.dep_id}, ${data.branch_id}, true, '${data.phone}', '${key}', '${code}');`,(err)=> {
+                                        if(err){
+                                            reject()
+                                        }
+                                        else{
+                                            resolve()
+                                        }
+                                    })
+                                }   
+                            })
+                        }
                     })
-                })
+                }
             })
         }
         else{
@@ -155,10 +169,11 @@ router.get('/freshleads', async (req, res)=> {
         if(req.query.dep_id&&req.query.branch_id){
             connection.query(`select * from customers where assigned=false and customer_progress='Not started' and customer_progress!='Booked' and dep_id=${req.query.dep_id} and branch_id=${req.query.branch_id} and booked=false ${req.query.name? `and lower(customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.progress? `and customer_progress='${req.query.progress}'`: ''} ${req.query.id? `and customer_id=${req.query.id} or cid=${req.query.id}`: ''} ${req.query.phone? `and customer_phone like '%${req.query.phone}%'`: ''} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};;`, (err, response) => {
                 if(err){
-                    console.log(err)
                     reject()
                 }
-                resolve(response.rows)
+                else{
+                    resolve(response.rows)
+                }
             })
         }
         else{
@@ -187,7 +202,9 @@ router.get('/oldleads', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(response.rows)
+                else{
+                    resolve(response.rows)
+                }
             })
         }
         else{
@@ -208,53 +225,5 @@ router.get('/oldleads', async (req, res)=> {
         })
     })
 })
-
-// router.get('/activity/:id', (req, res)=> {
-//     const result = new Promise((resolve, reject)=> {
-//         connection.query(`select * from user_activity where user_id='${req.params.id}';`, (err, response)=> {
-//             if(err){
-//                 reject()
-//             }
-//             resolve(response.rows)
-//         })
-//     })
-
-//     result.then((data)=> {
-//         res.status(200).json({
-//             result: data,
-//             success: true
-//         })
-//     })
-//     .catch(()=> {
-//         res.status(500).json({
-//             result: "fetching user activity failed",
-//             success: false
-//         })
-//     })
-// })
-
-// router.delete('/:id', (req, res)=> {
-//     const result = new Promise((resolve, reject)=> {
-//         connection.query(`DELETE FROM users WHERE user_id=${req.params.id}`, (err, response) => {
-//             if(err){
-//                 reject("Deleting user data failed")
-//             }
-//             resolve("user data removed")
-//         })
-//     })
-
-//     result.then((message)=> {
-//         res.status(200).json({
-//             result: message,
-//             success: true
-//         })
-//     })
-//     .catch((message)=> {
-//         res.status(400).json({
-//             result: message,
-//             success: false
-//         })
-//     })
-// })
 
 module.exports = router;

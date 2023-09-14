@@ -6,11 +6,7 @@ router.post('/', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(data.tour_id&&data.food_name&&data.food_category&&data.food_type&&data.price){
             connection.query(`insert into food (tour_id, food_name, food_category, food_type, price) values (${data.tour_id}, '${data.food_name}', '${data.food_category}', '${data.food_type}', ${data.price});`, (err)=> {
-                if(err){
-                    console.log(err)
-                    reject()
-                }
-                resolve()
+                err? reject(): resolve()
             })
         }
         else{
@@ -36,10 +32,7 @@ router.get('/', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.tour_id){
             connection.query(`select * from food where tour_id=${req.query.tour_id};`, (err, result)=> {
-                if(err){
-                    reject()
-                }
-                resolve(result.rows)
+                err? reject(): resolve(result.rows)
             })
         }
         else{

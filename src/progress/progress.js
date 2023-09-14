@@ -8,7 +8,9 @@ router.get('/', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(response.rows)
+                else{
+                    resolve(response.rows)
+                }
             })
         }
         else{
@@ -38,7 +40,9 @@ router.post('/', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{

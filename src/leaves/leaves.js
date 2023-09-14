@@ -9,7 +9,9 @@ router.post('/', async (req, res) => {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -56,10 +58,7 @@ router.get('/', (req, res)=> {
     const result = new Promise((resolve, reject) => {
         if(req.query.dep_id&&req.query.branch_id){
             connection.query(`select leave_request.leave_id, users.user_name, leave_request.apply_date, leave_request.start_date, leave_request.reason, leave_request.end_date from leave_request join users on leave_request.user_id = users.user_id where leave_request.dep_id=${req.query.dep_id} and leave_request.branch_id=${req.query.branch_id} and leave_request.status='pending';`, (err, response)=> {
-                if(err){
-                    reject()
-                }
-                resolve(response.rows)
+                err ? reject(): resolve(response.rows)
             })
         }
         else{

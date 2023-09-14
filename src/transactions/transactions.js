@@ -8,7 +8,9 @@ router.get('/', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(response.rows)
+                else{
+                    resolve(response.rows)
+                }
             })
         }
         else{

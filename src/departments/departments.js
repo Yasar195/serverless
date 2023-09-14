@@ -4,10 +4,7 @@ const router = require('express').Router()
 router.get('/', async (req, res)=> {
     const departments = new Promise((resolve, reject) => {
         connection.query(`select * from departments;`,(err, response)=> {
-            if(err){
-                reject()
-            }
-            resolve(response.rows)
+            err? reject(): resolve(response.rows)
         })
     })
 
@@ -28,10 +25,7 @@ router.get('/', async (req, res)=> {
 router.get('/:id', async (req, res)=> {
     const departments = new Promise((resolve, reject) => {
         connection.query(`select * from departments where dep_id= ${req.params.id};`,(err, response)=> {
-            if(err){
-                reject()
-            }
-            resolve(response.rows)
+            err? reject(): resolve(response.rows)
         })
     })
 

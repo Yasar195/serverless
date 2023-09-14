@@ -10,7 +10,9 @@ router.get('/', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(response.rows)
+                else{
+                    resolve(response.rows)
+                }
             })
         }
         else{
@@ -39,17 +41,23 @@ router.delete('/places', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                connection.query(`delete from addon where place_id=${req.query.place_id};`, (err)=> {
-                    if(err){
-                        reject()
-                    }
-                    connection.query(`delete from place where place_id=${req.query.place_id};`, (err)=> {
+                else{
+                    connection.query(`delete from addon where place_id=${req.query.place_id};`, (err)=> {
                         if(err){
                             reject()
                         }
-                        resolve()
+                        else{
+                            connection.query(`delete from place where place_id=${req.query.place_id};`, (err)=> {
+                                if(err){
+                                    reject()
+                                }
+                                else{
+                                    resolve()
+                                }
+                            })
+                        }
                     })
-                })
+                }
             })
         }
         else{
@@ -78,7 +86,9 @@ router.get('/places', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(response.rows)
+                else{
+                    resolve(response.rows)   
+                }
             })
         }
         else{
@@ -107,7 +117,9 @@ router.delete('/activities', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -136,7 +148,9 @@ router.delete('/addons', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -165,7 +179,9 @@ router.get('/addons', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(response.rows)
+                else{
+                    resolve(response.rows)
+                }
             })
         }
         else{
@@ -194,7 +210,9 @@ router.get('/activity', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(response.rows)
+                else{
+                    resolve(response.rows)
+                }
             })
         }
         else{
@@ -226,21 +244,25 @@ router.post('/createtours', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                if(file){ 
-                    const params = {
-                        Bucket: 'tele-profile',
-                        Key: key,
-                        Body: file.pdf.data,
-                    };
-                    s3.upload(params, function (err) {
-                        if (err) {
-                            reject()
-                        }
-                        resolve()
-                    })
-                }
                 else{
-                    resolve()
+                    if(file){ 
+                        const params = {
+                            Bucket: 'tele-profile',
+                            Key: key,
+                            Body: file.pdf.data,
+                        };
+                        s3.upload(params, function (err) {
+                            if (err) {
+                                reject()
+                            }
+                            else{
+                                resolve()
+                            }
+                        })
+                    }
+                    else{
+                        resolve()
+                    }
                 }
             })
         }
@@ -271,7 +293,9 @@ router.post('/createplace', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -301,7 +325,9 @@ router.put('/createplace', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -331,7 +357,9 @@ router.put('/createaddons', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -361,7 +389,9 @@ router.put('/createactivity', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -391,7 +421,9 @@ router.post('/createactivity', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -421,7 +453,9 @@ router.post('/createaddons', async (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve()
+                else{
+                    resolve()
+                }
             })
         }
         else{
@@ -450,7 +484,9 @@ router.get('/itinerary', (req, res)=> {
                 if(err){
                     reject()
                 }
-                resolve(response.rows)
+                else{
+                    resolve(response.rows)
+                }
             })
         }
         else{
@@ -473,7 +509,6 @@ router.get('/itinerary', (req, res)=> {
         })
     })
     .catch((err)=> {
-        console.log(err)
         res.status(500).json({
             result: "fetching fixed itinerary failed",
             success: false
