@@ -37,7 +37,7 @@ router.post('/', (req, res)=> {
 router.get('/', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.customer_id){
-            connection.query(`select created, shot_id from snapshots where customer_id=${req.query.customer_id};`, (err, result)=> {
+            connection.query(`select created, shot_id, tour_id from snapshots where customer_id=${req.query.customer_id};`, (err, result)=> {
                 if(err){
                     reject()
                 }
@@ -52,6 +52,9 @@ router.get('/', (req, res)=> {
     })
     
     result.then((data)=> {
+        data.forEach(snap => {
+            snap.tour_id = snap.tour_id.split(',')
+        })
         res.status(200).json({
             result: data,
             success: true
