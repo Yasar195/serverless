@@ -38,12 +38,14 @@ router.get('/', async (req, res) => {
             if(err){
                 reject()
             }
-            const registered = result.rows[0].registered
-            if(registered){
-                resolve(result.rows)
-            }
             else{
-                reject()
+                const registered = result.rows[0].registered
+                if(registered){
+                    resolve(result.rows)
+                }
+                else{
+                    reject()
+                }
             }
         })
     })
@@ -76,10 +78,7 @@ router.get('/', async (req, res) => {
 router.get('/admins', async (req, res)=> {
     const user = new Promise((resolve, reject) => {
         connection.query(`select * from admins where admin_id='${res.locals.uid}';`, (err, result)=> {
-            if(err){
-                reject()
-            }
-            resolve(result.rows)
+            err? reject(): resolve(result.rows)
         })
     })
 
@@ -101,10 +100,7 @@ router.get('/telecallers', (req, res)=> {
     const user = new Promise((resolve, reject) => {
         if(req.query.dep_id&&req.query.branch_id){
             connection.query(`select * from users where user_type='telecaller' and dep_id=${req.query.dep_id} and branch_id=${req.query.branch_id};`, (err, result)=> {
-                if(err){
-                    reject()
-                }
-                resolve(result.rows)
+                err? reject(): resolve(result.rows)
             })
         }
         else{
@@ -130,10 +126,7 @@ router.get('/field', (req, res)=> {
     const user = new Promise((resolve, reject) => {
         if(req.query.dep_id){
             connection.query(`select * from users where user_type='field staff' and dep_id=${req.query.dep_id};`, (err, result)=> {
-                if(err){
-                    reject()
-                }
-                resolve(result.rows)
+                err? reject(): resolve(result.rows)
             })
         }
         else{
@@ -163,44 +156,58 @@ router.get('/dash', (req, res)=> {
                 if(err){
                     reject()
                 }
-                data.tours = tourres.rows[0].count
-                connection.query(`select count(*) from customers where dep_id=${req.query.dep_id} and branch_id= ${req.query.branch_id};`, (err, cusres)=> {
-                    if(err){
-                        reject()
-                    }
-                    data.customers = cusres.rows[0].count
-                    connection.query(`select count(*) from users where dep_id=${req.query.dep_id} and branch_id= ${req.query.branch_id};`, (err, useres)=> {
+                else{
+                    data.tours = tourres.rows[0].count
+                    connection.query(`select count(*) from customers where dep_id=${req.query.dep_id} and branch_id= ${req.query.branch_id};`, (err, cusres)=> {
                         if(err){
                             reject()
                         }
-                        data.users = useres.rows[0].count
-                        connection.query(`select count(*) from leads where dep_id=${req.query.dep_id} and branch_id= ${req.query.branch_id};`, (err, callres)=> {
-                            if(err){
-                                reject()
-                            }
-                            data.calls = callres.rows[0].count
-                            connection.query(`select count(*) from leads where dep_id=${req.query.dep_id} and branch_id= ${req.query.branch_id} and follow_up=true;`, (err, folres)=> {
+                        else{
+                            data.customers = cusres.rows[0].count
+                            connection.query(`select count(*) from users where dep_id=${req.query.dep_id} and branch_id= ${req.query.branch_id};`, (err, useres)=> {
                                 if(err){
                                     reject()
                                 }
-                                data.follow_ups = folres.rows[0].count
-                                connection.query(`select count(*) from bookings where dep_id=${req.query.dep_id} and branch_id= ${req.query.branch_id};`, (err, bookres)=> {
-                                    if(err){
-                                        reject()
-                                    }
-                                    data.bookings = bookres.rows[0].count
-                                    connection.query(`select count(*) from bookings where dep_id=${req.query.dep_id} and branch_id= ${req.query.branch_id} and payment_complete=true;`, (err, bookres)=> {
+                                else{
+                                    data.users = useres.rows[0].count
+                                    connection.query(`select count(*) from leads where dep_id=${req.query.dep_id} and branch_id= ${req.query.branch_id};`, (err, callres)=> {
                                         if(err){
                                             reject()
                                         }
-                                        data.completed = bookres.rows[0].count
-                                        resolve(data)
+                                        else{
+                                            data.calls = callres.rows[0].count
+                                            connection.query(`select count(*) from leads where dep_id=${req.query.dep_id} and branch_id= ${req.query.branch_id} and follow_up=true;`, (err, folres)=> {
+                                                if(err){
+                                                    reject()
+                                                }
+                                                else{
+                                                    data.follow_ups = folres.rows[0].count
+                                                    connection.query(`select count(*) from bookings where dep_id=${req.query.dep_id} and branch_id= ${req.query.branch_id};`, (err, bookres)=> {
+                                                        if(err){
+                                                            reject()
+                                                        }
+                                                        else{
+                                                            data.bookings = bookres.rows[0].count
+                                                            connection.query(`select count(*) from bookings where dep_id=${req.query.dep_id} and branch_id= ${req.query.branch_id} and payment_complete=true;`, (err, bookres)=> {
+                                                                if(err){
+                                                                    reject()
+                                                                }
+                                                                else{
+                                                                    data.completed = bookres.rows[0].count
+                                                                    resolve(data)
+                                                                }
+                                                            })
+                                                        }
+                                                    })
+                                                }
+                                            })
+                                        }
                                     })
-                                })
+                                }
                             })
-                        })
+                        }
                     })
-                })
+                }
             })
         }
         else{

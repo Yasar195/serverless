@@ -27,37 +27,39 @@ router.post('/upload', (req, res)=> {
             if (err) {
               reject()
             }
-            connection.query(`update customers set user_id='${res.locals.uid}' where customer_id=${data.customer_id};`, (err)=> {
-                if(err){
-                    reject()
-                }
-                connection.query(`insert into customer_response (customer_id, response_text, response_key, call_date, user_id) values (${data.customer_id}, '${data.response_text}', '${key}', '${data.date}', '${res.locals.uid}');`, (err)=> {
+            else{
+                connection.query(`update customers set user_id='${res.locals.uid}' where customer_id=${data.customer_id};`, (err)=> {
                     if(err){
                         reject()
                     }
-                    if(data.follow_date){
-                        connection.query(`update leads set follow_up=true, follow_up_date='${data.follow_date}' where lead_id=${data.lead_id};`, (err)=>{
-                            if(err){
-                                reject()
-                            }
-                            resolve()
-                        })
-                    }
                     else{
-                        connection.query(`update customers set assigned=false, customer_progress='${req.body.customer_progress}' where customer_id=${req.body.customer_id};`, (err) => {
+                        connection.query(`insert into customer_response (customer_id, response_text, response_key, call_date, user_id) values (${data.customer_id}, '${data.response_text}', '${key}', '${data.date}', '${res.locals.uid}');`, (err)=> {
                             if(err){
                                 reject()
                             }
-                            connection.query(`delete from leads where lead_id=${req.body.lead_id};`, (err)=>{
-                                if(err){
-                                    reject()
+                            else{
+                                if(data.follow_date){
+                                    connection.query(`update leads set follow_up=true, follow_up_date='${data.follow_date}' where lead_id=${data.lead_id};`, (err)=>{
+                                        err? reject(): resolve()
+                                    })
                                 }
-                                resolve()
-                            })
+                                else{
+                                    connection.query(`update customers set assigned=false, customer_progress='${req.body.customer_progress}' where customer_id=${req.body.customer_id};`, (err) => {
+                                        if(err){
+                                            reject()
+                                        }
+                                        else{
+                                            connection.query(`delete from leads where lead_id=${req.body.lead_id};`, (err)=>{
+                                                err? reject(): resolve()
+                                            })
+                                        }
+                                    })
+                                }
+                            }
                         })
                     }
                 })
-            })
+            }
         });
     })
 
@@ -80,10 +82,7 @@ router.get('/:id', (req, res)=> {
     const audios = new Promise((resolve, reject)=> {
         if(req.params.id){
             connection.query(`select * from customer_response join users on customer_response.user_id = users.user_id where customer_response.customer_id=${req.params.id} order by response_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};;`, (err, result)=> {
-                if(err){
-                    reject()
-                }
-                resolve(result.rows)
+                err? reject(): resolve(result.rows)
             })
         }
         else{
