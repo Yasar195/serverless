@@ -66,7 +66,7 @@ app.post('/application/users', async (req, res)=> {
     })
 })
 
-app.use(authenticate)
+// app.use(authenticate)
 app.use('/users', users)
 app.use('/departments', departments)
 app.use('/branches', branches)

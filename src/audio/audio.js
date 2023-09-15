@@ -6,61 +6,61 @@ const s3 = require('../utils/aws')
 router.post('/upload', (req, res)=> {
 
     const data = req.body
+    const key = `audios/${generateRandomString(10)}.mp3`
 
-    if (!req.files || !data.date || !data.response_text || !data.lead_id || !data.customer_progress || !data.customer_id) {
+    if (!data.response_text || !data.lead_id || !data.customer_progress || !data.customer_id) {
         return res.status(400).json({
-            result: 'No audio file uploaded',
+            result: 'Response adding failed',
             success: false
         });
     }
 
-    const file = req.files.audio;
-    const key = `audios/${generateRandomString(10)}.mp3`
-    const params = {
-        Bucket: 'tele-profile',
-        Key: key,
-        Body: file.data,
-    };
-
     const upload = new Promise((resolve, reject)=> {
-        s3.upload(params, function (err) {
-            if (err) {
-              reject()
+        if(req.files.audio){
+            const file = req.files.audio;
+            const params = {
+                Bucket: 'tele-profile',
+                Key: key,
+                Body: file.data,
+            };
+            s3.upload(params, function (err) {
+                if (err) {
+                  reject()
+                }
+            });
+        }
+
+        connection.query(`update customers set user_id='${res.locals.uid}' where customer_id=${data.customer_id};`, (err)=> {
+            if(err){
+                reject()
             }
             else{
-                connection.query(`update customers set user_id='${res.locals.uid}' where customer_id=${data.customer_id};`, (err)=> {
+                connection.query(`insert into customer_response (customer_id, response_text${req.files.audio? `, response_key`: ``}, user_id) values (${data.customer_id}, '${data.response_text}'${req.files.audio? `, ${key}`: ``}, '${res.locals.uid}');`, (err)=> {
                     if(err){
                         reject()
                     }
                     else{
-                        connection.query(`insert into customer_response (customer_id, response_text, response_key, call_date, user_id) values (${data.customer_id}, '${data.response_text}', '${key}', '${data.date}', '${res.locals.uid}');`, (err)=> {
-                            if(err){
-                                reject()
-                            }
-                            else{
-                                if(data.follow_date){
-                                    connection.query(`update leads set follow_up=true, follow_up_date='${data.follow_date}' where lead_id=${data.lead_id};`, (err)=>{
+                        if(data.follow_date){
+                            connection.query(`update leads set follow_up=true, follow_up_date='${data.follow_date}' where lead_id=${data.lead_id};`, (err)=>{
+                                err? reject(): resolve()
+                            })
+                        }
+                        else{
+                            connection.query(`update customers set assigned=false, customer_progress='${req.body.customer_progress}' where customer_id=${req.body.customer_id};`, (err) => {
+                                if(err){
+                                    reject()
+                                }
+                                else{
+                                    connection.query(`delete from leads where lead_id=${req.body.lead_id};`, (err)=>{
                                         err? reject(): resolve()
                                     })
                                 }
-                                else{
-                                    connection.query(`update customers set assigned=false, customer_progress='${req.body.customer_progress}' where customer_id=${req.body.customer_id};`, (err) => {
-                                        if(err){
-                                            reject()
-                                        }
-                                        else{
-                                            connection.query(`delete from leads where lead_id=${req.body.lead_id};`, (err)=>{
-                                                err? reject(): resolve()
-                                            })
-                                        }
-                                    })
-                                }
-                            }
-                        })
+                            })
+                        }
                     }
                 })
             }
-        });
+        })
     })
 
     upload.then(()=> {
