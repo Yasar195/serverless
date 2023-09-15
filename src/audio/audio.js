@@ -92,12 +92,14 @@ router.get('/:id', (req, res)=> {
 
     audios.then((data)=> {
         data.forEach(element => {
-            const params = {
-                Bucket: 'tele-profile',
-                Key: element.response_key,
-            };
-            const url = s3.getSignedUrl('getObject', params);
-            element.url = url
+            if(element.response_key){
+                const params = {
+                    Bucket: 'tele-profile',
+                    Key: element.response_key,
+                };
+                const url = s3.getSignedUrl('getObject', params);
+                element.url = url
+            }
         });
             
         res.status(200).json({
