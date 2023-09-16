@@ -15,6 +15,7 @@ const snapshots = require('./snapshots/snapshots')
 const vehicles = require('./vehicles/vehicles')
 const bookings = require('./bookings/bookings')
 const progress = require('./progress/progress')
+const prices = require('./prices/prices')
 const transactions = require('./transactions/transactions')
 const foods = require('./food/food')
 const fileUpload = require('express-fileupload');
@@ -83,6 +84,7 @@ app.use('/progress', progress)
 app.use('/transactions', transactions)
 app.use('/snapshots', snapshots)
 app.use('/foods', foods)
+app.use('/prices', prices)
 
 
 app.all('*', (req, res)=> {
