@@ -495,13 +495,15 @@ router.get('/itinerary', (req, res)=> {
     })
 
     result.then((data)=> {
-        if(data.length !== 0){
-            const params = {
-                Bucket: 'tele-profile',
-                Key: data[0].tour_pdf,
-            };
-            const url = s3.getSignedUrl('getObject', params);
-            data[0].pdf_link = url;
+        if(data[0].tour_pdf){
+            if(data.length !== 0){
+                const params = {
+                    Bucket: 'tele-profile',
+                    Key: data[0].tour_pdf,
+                };
+                const url = s3.getSignedUrl('getObject', params);
+                data[0].pdf_link = url;
+            }
         }
         res.status(200).json({
             result: data,
