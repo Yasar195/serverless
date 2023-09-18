@@ -1,11 +1,13 @@
 const connection = require('../utils/Connect')
 const router = require('express').Router()
 
-router.get('/places', (req, res)=> {
+router.post('/place/getprice', (req, res)=> {
+    const data = req.body
     const result = new Promise((resolve, reject)=> {
-        if(req.query.vehicle_id&&req.query.place_id){
-            connection.query(`select * from place_vehicle where place_id=${req.query.place_id} and vehicle_id=${req.query.vehicle_id};`, (err, response)=> {
-                err? reject(): resolve(response.rows[0])
+        if(data.vehicle_id.length>0&&data.place_id){
+            const ids = String(data.vehicle_id)
+            connection.query(`select * from place_vehicle where (vehicle_id in (${ids})) and vehicle_id=${data.vehicle_id};`, (err, response)=> {
+                err? reject(): resolve(response.rows)
             })
         }
         else{
@@ -54,11 +56,13 @@ router.post('/places', (req, res)=> {
     })
 })
 
-router.get('/addons', (req, res)=> {
+router.post('/addon/getprice', (req, res)=> {
+    const data = req.body
     const result = new Promise((resolve, reject)=> {
-        if(req.query.vehicle_id&&req.query.addon_id){
-            connection.query(`select * from addon_vehicle where addon_id=${req.query.addon_id} and vehicle_id=${req.query.vehicle_id};`, (err, response)=> {
-                err? reject(): resolve(response.rows[0])
+        if(data.vehicle_id.length>0&&data.addon_id){
+            const ids = String(data.vehicle_id)
+            connection.query(`select * from addon_vehicle where (addon_id in (${ids})) and vehicle_id=${data.vehicle_id};`, (err, response)=> {
+                err? reject(): resolve(response.rows)
             })
         }
         else{
