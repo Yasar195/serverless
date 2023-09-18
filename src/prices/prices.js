@@ -30,8 +30,8 @@ router.get('/places', (req, res)=> {
 router.post('/places', (req, res)=> {
     const data = req.body
     const result = new Promise((resolve, reject)=> {
-        if(data.vehicle_id&&data.place_id&&data.pickup_price&&data.dropoff_price&&data.daytour_price&&data.addon_price){
-            connection.query(`insert into place_vehicle(vehicle_id, place_id, pickup_price, dropoff_price, daytour_price, addon_price) values(${data.vehicle_id}, ${data.place_id}, ${data.pickup_price}, ${data.dropoff_price},${data.daytour_price},${data.addon_price});`, (err)=> {
+        if(data.vehicle_id&&data.place_id&&data.price){
+            connection.query(`insert into place_vehicle(vehicle_id, place_id, price) values(${data.vehicle_id}, ${data.place_id}, ${data.price});`, (err)=> {
                 err? reject(): resolve()
             })
         }
@@ -83,8 +83,8 @@ router.get('/addons', (req, res)=> {
 router.post('/addons', (req, res)=> {
     const data = req.body
     const result = new Promise((resolve, reject)=> {
-        if(data.vehicle_id&&data.addon_id&&data.pickup_price&&data.dropoff_price&&data.daytour_price&&data.addon_price){
-            connection.query(`insert into addon_vehicle(vehicle_id, addon_id, pickup_price, dropoff_price, daytour_price, addon_price) values(${data.vehicle_id}, ${data.addon_id}, ${data.pickup_price}, ${data.dropoff_price},${data.daytour_price},${data.addon_price});`, (err)=> {
+        if(data.vehicle_id&&data.addon_id&&data.price){
+            connection.query(`insert into addon_vehicle(vehicle_id, addon_id, price) values(${data.vehicle_id}, ${data.addon_id}, ${data.price});`, (err)=> {
                 err? reject(): resolve()
             })
         }

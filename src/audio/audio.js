@@ -7,6 +7,7 @@ router.post('/upload', (req, res)=> {
 
     const data = req.body
     const key = `audios/${generateRandomString(10)}.mp3`
+    console.log(data)
 
     if (!data.response_text || !data.lead_id || !data.customer_progress || !data.customer_id) {
         return res.status(400).json({
@@ -16,7 +17,8 @@ router.post('/upload', (req, res)=> {
     }
 
     const upload = new Promise((resolve, reject)=> {
-        if(req.files.audio){
+
+        if(req.files){
             const file = req.files.audio;
             const params = {
                 Bucket: 'tele-profile',
@@ -35,7 +37,8 @@ router.post('/upload', (req, res)=> {
                 reject()
             }
             else{
-                connection.query(`insert into customer_response (customer_id, response_text${req.files.audio? `, response_key`: ``}, user_id) values (${data.customer_id}, '${data.response_text}'${req.files.audio? `, ${key}`: ``}, '${res.locals.uid}');`, (err)=> {
+                console.log('hai')
+                connection.query(`insert into customer_response (customer_id, response_text${req.files? `, response_key`: ``}, user_id) values (${data.customer_id}, '${data.response_text}'${req.files? `, '${key}'`: ``}, '${res.locals.uid}');`, (err)=> {
                     if(err){
                         reject()
                     }
