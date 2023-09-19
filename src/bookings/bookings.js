@@ -2,6 +2,7 @@ const connection = require('../utils/Connect')
 const router = require('express').Router()
 const { generateRandomString } = require('../utils/utils')
 const s3 = require('../utils/aws')
+const { ConnectParticipant } = require('aws-sdk')
 
 router.post('/', (req, res)=> {
     const key = `itineraries/${generateRandomString(10)}.pdf`
@@ -567,6 +568,27 @@ router.get('/accounts/notifications', (req, res)=> {
     .catch(()=> {
         res.status(400).json({
             result: "fetching not advanced bookings failed",
+            success: false
+        })
+    })
+})
+
+router.get('/telecaller', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        connection.query(`select bookings.booking_date, tour.tour_name, customers.customer_name, bookings.points from bookings join customers on bookings.customer_id = customers.customer_id join tour on bookings.tour_id=tour.tour_id where bookings.user_id='${res.locals.uid}' and EXTRACT(MONTH FROM bookings.booking_date) = EXTRACT(MONTH FROM CURRENT_DATE);`, (err, response)=> {
+            err? reject(): resolve(response.rows)
+        })
+    })
+
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'fetching booking detailes failed',
             success: false
         })
     })
