@@ -59,9 +59,10 @@ router.post('/places', (req, res)=> {
 router.post('/addon/getprice', (req, res)=> {
     const data = req.body
     const result = new Promise((resolve, reject)=> {
-        if(data.vehicle_id.length>0&&data.addon_id){
-            const ids = String(data.vehicle_id)
-            connection.query(`select * from addon_vehicle where (vehicle_id in (${ids})) and addon_id=${data.addon_id};`, (err, response)=> {
+        if(data.vehicle_id.length>0&&data.addon_id.length>0){
+            const vids = String(data.vehicle_id)
+            const aids = String(data.addon_id)
+            connection.query(`select * from addon_vehicle where (vehicle_id in (${vids})) and (addon_id in (${aids}));`, (err, response)=> {
                 err? reject(): resolve(response.rows)
             })
         }
