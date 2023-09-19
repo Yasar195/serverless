@@ -6,7 +6,7 @@ router.post('/place/getprice', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(data.vehicle_id.length>0&&data.place_id){
             const ids = String(data.vehicle_id)
-            connection.query(`select * from place_vehicle where (vehicle_id in (${ids})) and vehicle_id=${data.vehicle_id};`, (err, response)=> {
+            connection.query(`select * from place_vehicle where (vehicle_id in (${ids})) and place_id=${data.place_id};`, (err, response)=> {
                 err? reject(): resolve(response.rows)
             })
         }
@@ -61,7 +61,7 @@ router.post('/addon/getprice', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(data.vehicle_id.length>0&&data.addon_id){
             const ids = String(data.vehicle_id)
-            connection.query(`select * from addon_vehicle where (addon_id in (${ids})) and vehicle_id=${data.vehicle_id};`, (err, response)=> {
+            connection.query(`select * from addon_vehicle where (vehicle_id in (${ids})) and addon_id=${data.addon_id};`, (err, response)=> {
                 err? reject(): resolve(response.rows)
             })
         }
