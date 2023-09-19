@@ -575,7 +575,7 @@ router.get('/accounts/notifications', (req, res)=> {
 
 router.get('/telecaller', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
-        connection.query(`select bookings.booking_date, tour.tour_name, customers.customer_name, bookings.points from bookings join customers on bookings.customer_id = customers.customer_id join tour on bookings.tour_id=tour.tour_id where bookings.user_id='${res.locals.uid}' and EXTRACT(MONTH FROM bookings.booking_date) = EXTRACT(MONTH FROM CURRENT_DATE);`, (err, response)=> {
+        connection.query(`select bookings.booking_date, tour.tour_name, customers.customer_id, bookings.points from bookings join customers on bookings.customer_id = customers.customer_id join tour on bookings.tour_id=tour.tour_id where bookings.user_id='${res.locals.uid}' and EXTRACT(MONTH FROM bookings.booking_date) = EXTRACT(MONTH FROM CURRENT_DATE);`, (err, response)=> {
             err? reject(): resolve(response.rows)
         })
     })
