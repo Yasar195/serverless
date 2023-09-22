@@ -186,7 +186,7 @@ router.get('/tour', (req, res)=> {
 router.get('/individual', (req, res)=> {
     const result = new Promise((resolve, reject) => {
         if(req.query.user_id){
-            connection.query(`select * from leads join customers on leads.customer_id=customers.customer_id where leads.user_id='${req.query.user_id}' ${req.query.name? `and lower(customers.customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.id? `and customers.customer_id=${req.query.id}`: ''} ${req.query.phone? `and customers.customer_phone like '%${req.query.phone}%'`: ''} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
+            connection.query(`select * from leads join customers on leads.customer_id=customers.customer_id where leads.user_id='${req.query.user_id}' ${req.query.name? `and lower(customers.customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.id? `and customers.customer_id=${req.query.id}`: ''} ${req.query.phone? `and customers.customer_phone like '%${req.query.phone}%'`: ''} and leads.follow_up=${req.query.follow_up} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
                 err? reject(): resolve(response.rows)
             })
         }
@@ -238,6 +238,33 @@ router.put('/individual', (req, res)=> {
     .catch(()=> {
         res.status(400).json({
             result: 'lead deletion failed',
+            success: false
+        })
+    })
+})
+
+router.put('/individual/transfer', (req, res)=> {
+    const data = req.body;
+    const result = new Promise((resolve, reject) => {
+        if(data.lead_id&&data.user_id){
+            connection.query(`update leads set user_id='${data.user_id}' where lead_id=${data.lead_id};`, (err)=> {
+                err? reject(): resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: "lead transfer successfull",
+            success:true
+        })
+    })
+    .catch(()=> {
+        res.status(400).json({
+            result: 'lead transfer failed',
             success: false
         })
     })
