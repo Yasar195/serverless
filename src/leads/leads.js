@@ -107,7 +107,7 @@ router.get('/', async (req, res) => {
 router.get('/getanalytics', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         const data = {}
-        connection.query(`select count(*) from customer_response where user_id='${res.locals.uid}';`, (err, result)=> {
+        connection.query(`select count(*) from customer_response where user_id='${res.locals.uid}' and EXTRACT(MONTH FROM call_date) = EXTRACT(MONTH FROM CURRENT_DATE);`, (err, result)=> {
             if(err){
                 reject()
             }
@@ -126,7 +126,7 @@ router.get('/getanalytics', async (req, res)=> {
                             else{
                                 data.points = poires.rows[0].points
                                 data.target_points = parseInt(poires.rows[0].target_points)
-                                connection.query(`select count(*) from bookings where user_id='${res.locals.uid}';`, (err, boores)=> {
+                                connection.query(`select count(*) from bookings where user_id='${res.locals.uid}' and EXTRACT(MONTH FROM booking_date) = EXTRACT(MONTH FROM CURRENT_DATE)`, (err, boores)=> {
                                     if(err){
                                         reject()
                                     }
