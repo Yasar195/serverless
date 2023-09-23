@@ -112,4 +112,58 @@ router.post('/addons', (req, res)=> {
     })
 })
 
+router.put('/placeupdate', (req, res)=> {
+    const data = req.body
+    const result = new Promise((resolve, reject)=> {
+        if(data.price_id&&data.price){
+            connection.query(`update place_vehicle set price=${data.price} where price_id=${data.price_id};`, (err)=> {
+                err? reject(): resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: 'updating vehicle price success',
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'updating vehicle price failed',
+            success: true
+        })
+    })
+})
+
+router.put('/addonupdate', (req, res)=> {
+    const data = req.body
+    const result = new Promise((resolve, reject)=> {
+        if(data.price_id&&data.price){
+            connection.query(`update addon_vehicle set price=${data.price} where price_id=${data.price_id};`, (err)=> {
+                err? reject(): resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: 'updating vehicle price success',
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'updating vehicle price failed',
+            success: true
+        })
+    })
+})
+
 module.exports = router
