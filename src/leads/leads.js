@@ -5,7 +5,7 @@ router.post('/', async (req, res) => {
     const data = req.body;
     const result = new Promise((resolve, reject)=> {
         if(data.customer_id && data.user_id && data.dep_id && data.branch_id){
-            connection.query(`update customers set assigned=true where customer_id=${data.customer_id};`, (err)=> {
+            connection.query(`update customers set assigned=true, user_id='${res.locals.uid}' where customer_id=${data.customer_id};`, (err)=> {
                 if(err){
                     reject()
                 }
