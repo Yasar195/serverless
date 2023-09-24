@@ -226,4 +226,30 @@ router.get('/oldleads', async (req, res)=> {
     })
 })
 
+router.get('/points', async (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        connection.query(`select EXTRACT(MONTH FROM earned_month) as month, points from points where user_id='${res.locals.uid}' order by id desc;`, (err, response) => {
+            if(err){
+                reject()
+            }
+            else{
+                resolve(response.rows)
+            }
+        })
+    })
+
+    result.then((message)=> {
+        res.status(200).json({
+            result: message,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "fetching point history failed",
+            success: false
+        })
+    })
+})
+
 module.exports = router;
