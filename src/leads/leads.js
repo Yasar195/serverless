@@ -5,7 +5,7 @@ router.post('/', async (req, res) => {
     const data = req.body;
     const result = new Promise((resolve, reject)=> {
         if(data.customer_id && data.user_id && data.dep_id && data.branch_id){
-            connection.query(`update customers set assigned=true, user_id='${res.locals.uid}' where customer_id=${data.customer_id};`, (err)=> {
+            connection.query(`update customers set assigned=true where customer_id=${data.customer_id};`, (err)=> {
                 if(err){
                     reject()
                 }
@@ -43,8 +43,8 @@ router.post('/', async (req, res) => {
 
 router.get('/dash/followup', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
-        if(req.query.dep_id){
-            connection.query(`select users.user_name, leads.follow_up_date, customers.customer_name from leads join users on leads.user_id = users.user_id join customers on leads.customer_id = customers.customer_id where leads.dep_id=${req.query.dep_id} and leads.follow_up=true limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, result)=> {
+        if(req.query.dep_id&&req.query.branch_id){
+            connection.query(`select * from customers join users on customers.user_id=users.user_id where customers.assigned=false and customers.customer_progress!='Not started' and customers.customer_progress!='Booked' and customers.dep_id=${req.query.dep_id} and customers.branch_id=${req.query.branch_id} and customers.booked=false ${req.query.name? `and lower(customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.progress? `and customers.customer_progress='${req.query.progress}'`: ''} ${req.query.id? `and customers.customer_id=${req.query.id} or customers.cid=${req.query.id}`: ''} ${req.query.phone? `and customers.customer_phone like '%${req.query.phone}%'`: ''} and users.user_type='telecaller' limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, result)=> {
                 err? reject(): resolve(result.rows)
             })
         }
