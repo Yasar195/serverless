@@ -5,7 +5,7 @@ const s3 = require('../utils/aws')
 router.get('/', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id&&req.query.branch_id){
-            connection.query(`SELECT * FROM customers JOIN users ON customers.user_id = users.user_id JOIN departments ON customers.dep_id = departments.dep_id JOIN dep_branch ON customers.branch_id = dep_branch.id join branches on dep_branch.branch_id=branches.branch_id where customers.dep_id=${req.query.dep_id} and customers.branch_id=${req.query.branch_id} ${req.query.name? `and lower(customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.progress? `and customer_progress='${req.query.progress}'`: ''} ${req.query.user_id? `and customers.user_id like '%${req.query.user_id}%'`: ''} ${req.query.id? `and customer_id=${req.query.id} or cid=${req.query.id}`: ''} ${req.query.phone? `and customer_phone like '%${req.query.phone}%'`: ''} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, result)=> {
+            connection.query(`SELECT * FROM customers JOIN users ON customers.user_id = users.user_id JOIN departments ON customers.dep_id = departments.dep_id JOIN dep_branch ON customers.branch_id = dep_branch.id join branches on dep_branch.branch_id=branches.branch_id where customers.dep_id=${req.query.dep_id} and customers.branch_id=${req.query.branch_id} ${req.query.name? `and lower(customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.progress? `and customer_progress='${req.query.progress}'`: ''} ${req.query.user_id? `and customers.user_id like '%${req.query.user_id}%'`: ''} ${req.query.id? `and customers.customer_id=${req.query.id} or customers.cid=${req.query.id}`: ''} ${req.query.phone? `and customer_phone like '%${req.query.phone}%'`: ''} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, result)=> {
                 if(err){
                     reject()
                 }
@@ -36,10 +36,10 @@ router.get('/', async (req, res)=> {
 router.post('/', async (req, res)=> {
     const customer = req.body
     const upload = new Promise((resolve, reject)=> {
-        if(customer.customer_name && customer.customer_phone && customer.customer_vehicle && customer.customer_whatapp && customer.customer_progress && customer.customer_source && customer.customer_address && customer.customer_city && customer.customer_remarks && customer.dep_id && customer.branch_id && String(customer.customer_pax) && customer.customer_category){
-            connection.query(`insert into customers (customer_name, customer_phone,customer_vehicle, customer_whatsapp, customer_progress, customer_pax, customer_source, customer_address, customer_category, customer_city, customer_remarks, dep_id, user_id, branch_id, tour) values ('${customer.customer_name}', '${customer.customer_phone}', '${customer.customer_vehicle}', '${customer.customer_whatapp}', '${customer.customer_progress}', ${customer.customer_pax}, '${customer.customer_source}', '${customer.customer_address}', '${customer.customer_category}','${customer.customer_city}', '${customer.customer_remarks}', ${customer.dep_id}, '${res.locals.uid}', ${customer.branch_id}, '${customer.tour}');`, (err)=> {
+        if(customer.customer_name && customer.customer_phone && customer.customer_vehicle && customer.customer_progress && customer.customer_source && customer.customer_remarks && customer.dep_id && customer.branch_id && String(customer.customer_pax) && customer.customer_category){
+            connection.query(`insert into customers (customer_name, customer_phone,customer_vehicle, customer_progress, customer_pax, customer_source, customer_address, customer_category, customer_city, customer_remarks, dep_id, user_id, branch_id, tour) values ('${customer.customer_name}', '${customer.customer_phone}', '${customer.customer_vehicle}', '${customer.customer_progress}', ${customer.customer_pax}, '${customer.customer_source}', '${customer.customer_address}', '${customer.customer_category}','${customer.customer_city}', '${customer.customer_remarks}', ${customer.dep_id}, '${res.locals.uid}', ${customer.branch_id}, '${customer.tour}');`, (err)=> {
                 if(err){
-                    reject()
+                    reject(409)
                 }
                 else{
                     resolve()
@@ -47,7 +47,7 @@ router.post('/', async (req, res)=> {
             })
         }
         else{
-            reject()
+            reject(400)
         }
     })
 
@@ -57,8 +57,8 @@ router.post('/', async (req, res)=> {
             success: true
         })
     })
-    .catch(()=> {
-        res.status(500).json({
+    .catch((status)=> {
+        res.status(status).json({
             result: "user data upload failed",
             success: false
         })
@@ -68,8 +68,8 @@ router.post('/', async (req, res)=> {
 router.put('/', async (req, res)=> {
     const customer = req.body
     const upload = new Promise((resolve, reject)=> {
-        if(customer.customer_id&&customer.customer_name && customer.customer_phone && customer.customer_vehicle && customer.customer_whatapp && customer.customer_progress && customer.customer_source && customer.customer_address && customer.customer_city && customer.customer_remarks && String(customer.customer_pax) && customer.customer_category&&customer.tour){
-            connection.query(`update customers set customer_name='${customer.customer_name}', customer_phone='${customer.customer_phone}', customer_vehicle='${customer.customer_vehicle}', customer_whatsapp='${customer.customer_whatapp}' ${customer.tour_code? `,tour_code='${customer.tour_code}'`: ''}, customer_progress='${customer.customer_progress}', customer_source='${customer.customer_source}', customer_address='${customer.customer_address}', customer_city='${customer.customer_city}', customer_remarks='${customer.customer_remarks}', customer_pax='${customer.customer_pax}', customer_category='${customer.customer_category}', booked=false, user_id='${res.locals.uid}', tour='${customer.tour}' where customer_id=${customer.customer_id};`, (err)=> {
+        if(customer.customer_id&&customer.customer_name && customer.customer_phone && customer.customer_vehicle && customer.customer_progress && customer.customer_source && customer.customer_address && customer.customer_city && customer.customer_remarks && String(customer.customer_pax) && customer.customer_category&&customer.tour){
+            connection.query(`update customers set customer_name='${customer.customer_name}', customer_phone='${customer.customer_phone}', customer_vehicle='${customer.customer_vehicle}' ${customer.tour_code? `,tour_code='${customer.tour_code}'`: ''}, customer_progress='${customer.customer_progress}', customer_source='${customer.customer_source}', customer_address='${customer.customer_address}', customer_city='${customer.customer_city}', customer_remarks='${customer.customer_remarks}', customer_pax='${customer.customer_pax}', customer_category='${customer.customer_category}', booked=false, user_id='${res.locals.uid}', tour='${customer.tour}' where customer_id=${customer.customer_id};`, (err)=> {
                 if(err){
                     reject()
                 }
