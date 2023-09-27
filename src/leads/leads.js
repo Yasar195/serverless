@@ -124,6 +124,26 @@ router.get('/old', async (req, res) => {
     })
 })
 
+router.get('/', async (req, res) => {
+    const result = new Promise((resolve, reject)=> {
+        connection.query(`select * from customers join leads on customers.customer_id=leads.customer_id where leads.user_id = '${res.locals.uid}' and leads.follow_up=false and customers.customer_progress!='Not started' limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, result)=> {
+            err? reject(): resolve(result.rows)
+        })
+    })
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "fetching leads failed",
+            success: false
+        })
+    })
+})
+
 router.get('/getanalytics', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         const data = {}
