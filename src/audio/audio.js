@@ -118,4 +118,30 @@ router.get('/', (req, res)=> {
     })
 })
 
+router.get('/:id', (req, res)=> {
+    const audios = new Promise((resolve, reject)=> {
+        if(req.params.id){
+            connection.query(`select response_text, call_date from customer_response where customer_id=${req.params.id};`, (err, result)=> {
+                err? reject(): resolve(result.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    audios.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'fetching customer audio failed',
+            success: false
+        })
+    })
+})
+
 module.exports = router;
