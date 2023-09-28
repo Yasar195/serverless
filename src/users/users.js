@@ -37,12 +37,12 @@ router.post('/', async (req, res)=> {
     const customer = req.body
     const upload = new Promise((resolve, reject)=> {
         if(customer.customer_name && customer.customer_phone && customer.customer_vehicle && customer.customer_progress && customer.customer_source && customer.dep_id && customer.branch_id && String(customer.customer_pax) && customer.customer_category){
-            connection.query(`insert into customers (customer_name, customer_phone,customer_vehicle, customer_progress, customer_pax, customer_source, customer_address, customer_category, customer_city, customer_remarks, dep_id, user_id, branch_id, tour) values ('${customer.customer_name}', '${customer.customer_phone}', '${customer.customer_vehicle}', '${customer.customer_progress}', ${customer.customer_pax}, '${customer.customer_source}', '${customer.customer_address}', '${customer.customer_category}','${customer.customer_city}', '${customer.customer_remarks}', ${customer.dep_id}, '${res.locals.uid}', ${customer.branch_id}, '${customer.tour}');`, (err)=> {
+            connection.query(`insert into customers (customer_name, customer_phone,customer_vehicle, customer_progress, customer_pax, customer_source, customer_address, customer_category, customer_city, customer_remarks, dep_id, user_id, branch_id, tour) values ('${customer.customer_name}', '${customer.customer_phone}', '${customer.customer_vehicle}', '${customer.customer_progress}', ${customer.customer_pax}, '${customer.customer_source}', '${customer.customer_address}', '${customer.customer_category}','${customer.customer_city}', '${customer.customer_remarks}', ${customer.dep_id}, '${res.locals.uid}', ${customer.branch_id}, '${customer.tour}') returning customer_id;`, (err, response)=> {
                 if(err){
                     reject(409)
                 }
                 else{
-                    resolve()
+                    resolve(response.rows)
                 }
             })
         }
@@ -51,9 +51,9 @@ router.post('/', async (req, res)=> {
         }
     })
 
-    upload.then(()=> {
+    upload.then((data)=> {
         res.status(200).json({
-            result: "user data upload success",
+            result: data,
             success: true
         })
     })
@@ -167,7 +167,7 @@ router.post('/signup', (req, res)=> {
 router.get('/freshleads', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id&&req.query.branch_id){
-            connection.query(`select * from customers join users on customers.user_id=users.user_id where customers.assigned=false and customers.customer_progress='Not started' and customers.customer_progress!='Booked' and customers.dep_id=${req.query.dep_id} and customers.branch_id=${req.query.branch_id} and customers.booked=false ${req.query.name? `and lower(customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.progress? `and customers.customer_progress='${req.query.progress}'`: ''} ${req.query.id? `and customers.customer_id=${req.query.id} or customers.cid=${req.query.id}`: ''} ${req.query.phone? `and customers.customer_phone like '%${req.query.phone}%'`: ''} and users.user_type!='telecaller' limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response) => {
+            connection.query(`select * from customers join users on customers.user_id=users.user_id where customers.assigned=false and customers.customer_progress='Not started' and customers.customer_progress!='Booked' and customers.dep_id=${req.query.dep_id} and customers.branch_id=${req.query.branch_id} and customers.booked=false ${req.query.name? `and lower(customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.progress? `and customers.customer_progress='${req.query.progress}'`: ''} ${req.query.id? `and customers.customer_id=${req.query.id} or customers.cid=${req.query.id}`: ''} ${req.query.phone? `and customers.customer_phone like '%${req.query.phone}%'`: ''} and users.user_type!='telecaller' order by customers.customer_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response) => {
                 if(err){
                     reject()
                 }

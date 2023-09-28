@@ -37,7 +37,6 @@ router.post('/upload', (req, res)=> {
                 reject()
             }
             else{
-                console.log('hai')
                 connection.query(`insert into customer_response (customer_id, response_text${req.files? `, response_key`: ``}, user_id) values (${data.customer_id}, '${data.response_text}'${req.files? `, '${key}'`: ``}, '${res.locals.uid}');`, (err)=> {
                     if(err){
                         reject()
