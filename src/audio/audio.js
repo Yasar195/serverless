@@ -81,6 +81,58 @@ router.post('/upload', (req, res)=> {
     
 })
 
+router.get('/customers', (req, res)=> {
+    const audios = new Promise((resolve, reject)=> {
+        if(req.query.dep_id&&req.query.branch_id){
+            connection.query(`select customers.customer_id, customers.customer_name, customers.customer_phone, users.user_name from customer_response join users on customer_response.user_id = users.user_id join customers on customer_response.customer_id=customers.customer_id where customers.branch_id=${req.query.branch_id} and customers.dep_id=${req.query.dep_id} ${req.query.user_id? `and users.user_id='${req.query.user_id}'`: ''} ${req.query.id? `and customers.customer_id=${req.query.id}`: ''} ${req.query.name? `and lower(customers.customer_name) like lower('%${req.query.name}%')`: ''} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, result)=> {
+                err? reject(): resolve(result.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    audios.then((data)=> {        
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'fetching customer audio failed',
+            success: false
+        })
+    })
+})
+
+router.get('/customers/count', (req, res)=> {
+    const audios = new Promise((resolve, reject)=> {
+        if(req.query.dep_id&&req.query.branch_id){
+            connection.query(`select count(*) from customer_response join customers on customer_response.customer_id=customers.customer_id where customers.branch_id=${req.query.branch_id} and customers.dep_id=${req.query.dep_id};`, (err, result)=> {
+                err? reject(): resolve(result.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    audios.then((data)=> {        
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'fetching customer audio failed',
+            success: false
+        })
+    })
+})
+
 router.get('/', (req, res)=> {
     const audios = new Promise((resolve, reject)=> {
         if(req.query.dep_id&&req.query.branch_id){

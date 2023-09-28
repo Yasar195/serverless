@@ -195,6 +195,130 @@ router.get('/freshleads', async (req, res)=> {
     })
 })
 
+router.get('/count', async (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.dep_id&&req.query.branch_id){
+            connection.query(`select count(*) from customers where dep_id=${req.query.dep_id} and branch_id=${req.query.branch_id};`, (err, response) => {
+                if(err){
+                    reject()
+                }
+                else{
+                    resolve(response.rows)
+                }
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((message)=> {
+        res.status(200).json({
+            result: message,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "fetching fresh lead count failed",
+            success: false
+        })
+    })
+})
+
+router.get('/freshleads/count', async (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.dep_id&&req.query.branch_id){
+            connection.query(`select count(*) from customers where customer_progress='Not started' and assigned=false and dep_id=${req.query.dep_id} and branch_id=${req.query.branch_id};`, (err, response) => {
+                if(err){
+                    reject()
+                }
+                else{
+                    resolve(response.rows)
+                }
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((message)=> {
+        res.status(200).json({
+            result: message,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "fetching fresh lead count failed",
+            success: false
+        })
+    })
+})
+
+router.get('/oldleads/count', async (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.dep_id&&req.query.branch_id){
+            connection.query(`select count(*) from customers where customer_progress!='Not started' and assigned=false and dep_id=${req.query.dep_id} and branch_id=${req.query.branch_id};`, (err, response) => {
+                if(err){
+                    reject()
+                }
+                else{
+                    resolve(response.rows)
+                }
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((message)=> {
+        res.status(200).json({
+            result: message,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "fetching fresh lead count failed",
+            success: false
+        })
+    })
+})
+
+router.get('/assigned/count', async (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.dep_id&&req.query.branch_id){
+            connection.query(`select count(*) from customers join users on customers.user_id=users.user_id where customer_progress!='Not started' and users.user_type='telecaller' and customers.assigned=false and customers.dep_id=${req.query.dep_id} and customers.branch_id=${req.query.branch_id};`, (err, response) => {
+                if(err){
+                    reject()
+                }
+                else{
+                    resolve(response.rows)
+                }
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((message)=> {
+        res.status(200).json({
+            result: message,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "fetching fresh lead count failed",
+            success: false
+        })
+    })
+})
+
 router.get('/oldleads', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id&&req.query.branch_id){
