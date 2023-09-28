@@ -1,10 +1,11 @@
 const connection = require('../utils/Connect')
 const router = require('express').Router()
+const s3 = require('../utils/aws')
 
 router.get('/', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id&&req.query.branch_id){
-            connection.query(`select * from users join dep_branch on users.branch_id=dep_branch.id join branches on dep_branch.branch_id=branches.branch_id where users.dep_id=${req.query.dep_id} and users.branch_id=${req.query.branch_id} ${req.query.name? `and users.user_name like '%${req.query.name}%'`: ''} ${req.query.type? `and users.user_type='${req.query.type}'`: ''};`, (err, result)=> {
+            connection.query(`select * from users join dep_branch on users.branch_id=dep_branch.id join branches on dep_branch.branch_id=branches.branch_id where users.dep_id=${req.query.dep_id} and users.branch_id=${req.query.branch_id} ${req.query.name? `and lower(users.user_name) like lower('%${req.query.name}%')`: ''} ${req.query.type? `and users.user_type='${req.query.type}'`: ''};`, (err, result)=> {
                 if(err){
                     reject()
                 }
@@ -19,12 +20,24 @@ router.get('/', async (req, res)=> {
     })
 
     result.then((data) => {
+
+        data.forEach(element => {
+            if(element.profile_key){
+                const params = {
+                    Bucket: 'tele-profile',
+                    Key: element.profile_key,
+                };
+                const url = s3.getSignedUrl('getObject', params);
+                element.image_url = url
+            }
+        });
+        
         res.status(200).json({
             result: data,
             success: true
         })
     })
-    .catch(()=> {
+    .catch((err)=> {
         res.status(500).json({
             result: 'fetching staff details failed',
             success: false
