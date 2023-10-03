@@ -66,7 +66,7 @@ router.get('/dash/followup', (req, res)=> {
 
 router.get('/followup', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
-        connection.query(`select * from customers join leads on customers.customer_id=leads.customer_id where leads.user_id = '${res.locals.uid}' and leads.follow_up=true ${req.query.name? `and lower(customers.customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.id? `and customers.customer_id=${req.query.id}`: ''} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, result)=> {
+        connection.query(`select * from customers join leads on customers.customer_id=leads.customer_id where leads.user_id = '${res.locals.uid}' and leads.follow_up=true ${req.query.name? `and lower(customers.customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.id? `and customers.customer_id=${req.query.id}`: ''};`, (err, result)=> {
             err? reject(): resolve(result.rows)
         })
     })
@@ -267,9 +267,16 @@ router.put('/individual', (req, res)=> {
 router.put('/individual/transfer', (req, res)=> {
     const data = req.body;
     const result = new Promise((resolve, reject) => {
-        if(data.lead_id&&data.user_id){
-            connection.query(`update leads set user_id='${data.user_id}' where lead_id=${data.lead_id};`, (err)=> {
-                err? reject(): resolve()
+        if(data.lead_id&&data.user_id&&data.customer_id){
+            connection.query(`update customers set user_id='${data.user_id}' where customer_id=${data.customer_id};`, (err)=> {
+                if(err){
+                    reject()
+                }
+                else{
+                    connection.query(`update leads set user_id='${data.user_id}' where lead_id=${data.lead_id};`, (err)=> {
+                        err? reject(): resolve()
+                    })
+                }
             })
         }
         else{
