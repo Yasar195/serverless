@@ -37,13 +37,19 @@ router.post('/', async (req, res)=> {
     const customer = req.body
     const upload = new Promise((resolve, reject)=> {
         if(customer.customer_name && customer.customer_phone && customer.customer_vehicle && customer.customer_progress && customer.customer_source && customer.dep_id && customer.branch_id && String(customer.customer_pax) && customer.customer_category){
-            connection.query(`insert into customers (customer_name, customer_phone,customer_vehicle, customer_progress, customer_pax, customer_source, customer_address, customer_category, customer_city, customer_remarks, dep_id, user_id, branch_id, tour) values ('${customer.customer_name}', '${customer.customer_phone}', '${customer.customer_vehicle}', '${customer.customer_progress}', ${customer.customer_pax}, '${customer.customer_source}', '${customer.customer_address}', '${customer.customer_category}','${customer.customer_city}', '${customer.customer_remarks}', ${customer.dep_id}, '${res.locals.uid}', ${customer.branch_id}, '${customer.tour}') returning customer_id;`, (err, response)=> {
+            connection.query(`select max(cid) from customers;`, (err, resp)=> {
                 if(err){
-                    reject(409)
+                    reject();
                 }
-                else{
-                    resolve(response.rows)
-                }
+                const cid = resp.rows[0].max+1;
+                connection.query(`insert into customers (customer_name, customer_phone,customer_vehicle, customer_progress, customer_pax, customer_source, customer_address, customer_category, customer_city, customer_remarks, dep_id, user_id, branch_id, tour, cid) values ('${customer.customer_name}', '${customer.customer_phone}', '${customer.customer_vehicle}', '${customer.customer_progress}', ${customer.customer_pax}, '${customer.customer_source}', '${customer.customer_address}', '${customer.customer_category}','${customer.customer_city}', '${customer.customer_remarks}', ${customer.dep_id}, '${res.locals.uid}', ${customer.branch_id}, '${customer.tour}', ${cid});`, (err)=> {
+                    if(err){
+                        reject(409)
+                    }
+                    else{
+                        resolve([{customer_id: cid}])
+                    }
+                })
             })
         }
         else{
