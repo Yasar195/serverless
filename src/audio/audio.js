@@ -134,8 +134,8 @@ router.get('/customers/count', (req, res)=> {
 
 router.get('/', (req, res)=> {
     const audios = new Promise((resolve, reject)=> {
-        if(req.query.dep_id&&req.query.branch_id){
-            connection.query(`select * from customer_response join users on customer_response.user_id = users.user_id join customers on customer_response.customer_id=customers.customer_id where customers.branch_id=${req.query.branch_id} and customers.dep_id=${req.query.dep_id} ${req.query.user_id? `and users.user_id='${req.query.user_id}'`: ''} ${req.query.id? `and customers.customer_id=${req.query.id}`: ''} ${req.query.name? `and lower(customers.customer_name) like lower('%${req.query.name}%')`: ''} order by customer_response.response_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, result)=> {
+        if(req.query.customer_id){
+            connection.query(`select * from customer_response join users on customer_response.user_id = users.user_id join customers on customer_response.customer_id=customers.customer_id where customers.customer_id=${req.query.customer_id} ${req.query.user_id? `and users.user_id='${req.query.user_id}'`: ''} ${req.query.id? `and customers.customer_id=${req.query.id}`: ''} ${req.query.name? `and lower(customers.customer_name) like lower('%${req.query.name}%')`: ''} order by customer_response.response_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, result)=> {
                 err? reject(): resolve(result.rows)
             })
         }
