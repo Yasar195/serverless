@@ -7,7 +7,6 @@ router.post('/upload', (req, res)=> {
 
     const data = req.body
     const key = `audios/${generateRandomString(10)}.mp3`
-    console.log(data)
 
     if (!data.response_text || !data.lead_id || !data.customer_progress || !data.customer_id) {
         return res.status(400).json({
@@ -83,7 +82,7 @@ router.post('/upload', (req, res)=> {
 router.get('/customers', (req, res)=> {
     const audios = new Promise((resolve, reject)=> {
         if(req.query.dep_id&&req.query.branch_id){
-            connection.query(`select customers.cid, customers.customer_id, customers.customer_name, customers.customer_phone, users.user_name from customer_response join users on customer_response.user_id = users.user_id join customers on customer_response.customer_id=customers.customer_id where customers.branch_id=${req.query.branch_id} and customers.dep_id=${req.query.dep_id} ${req.query.user_id? `and customers.user_id='${req.query.user_id}'`: ''} ${req.query.id? `and customers.cid=${req.query.id}`: ''} ${req.query.name? `and lower(customers.customer_name) like lower('%${req.query.name}%')`: ''} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, result)=> {
+            connection.query(`select distinct customers.cid, customers.customer_id, customers.customer_name, customers.customer_phone, users.user_name from customer_response join users on customer_response.user_id = users.user_id join customers on customer_response.customer_id=customers.customer_id where customers.branch_id=${req.query.branch_id} and customers.dep_id=${req.query.dep_id} ${req.query.user_id? `and customers.user_id='${req.query.user_id}'`: ''} ${req.query.id? `and customers.cid=${req.query.id}`: ''} ${req.query.name? `and lower(customers.customer_name) like lower('%${req.query.name}%')`: ''} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, result)=> {
                 err? reject(): resolve(result.rows)
             })
         }
@@ -109,7 +108,7 @@ router.get('/customers', (req, res)=> {
 router.get('/customers/count', (req, res)=> {
     const audios = new Promise((resolve, reject)=> {
         if(req.query.dep_id&&req.query.branch_id){
-            connection.query(`select count(*) from customer_response join customers on customer_response.customer_id=customers.customer_id where customers.branch_id=${req.query.branch_id} and customers.dep_id=${req.query.dep_id};`, (err, result)=> {
+            connection.query(`select distinct count(*) from customer_response join customers on customer_response.customer_id=customers.customer_id where customers.branch_id=${req.query.branch_id} and customers.dep_id=${req.query.dep_id};`, (err, result)=> {
                 err? reject(): resolve(result.rows)
             })
         }
