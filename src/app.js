@@ -18,6 +18,7 @@ const progress = require('./progress/progress')
 const prices = require('./prices/prices')
 const transactions = require('./transactions/transactions')
 const foods = require('./food/food')
+const firebase = require('./firebase/firebase');
 const fileUpload = require('express-fileupload');
 const { authenticate, router } = require('../src/auth/auth')
 const cors = require('cors');
@@ -85,6 +86,7 @@ app.use('/transactions', transactions)
 app.use('/snapshots', snapshots)
 app.use('/foods', foods)
 app.use('/prices', prices)
+app.use('/firebase', firebase)
 
 
 app.all('*', (req, res)=> {

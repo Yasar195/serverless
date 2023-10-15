@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/node:lts-hydrogen
+FROM node:18
 WORKDIR /app
 COPY package.json /app
 RUN npm install
