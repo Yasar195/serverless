@@ -207,7 +207,7 @@ router.get('/individual', (req, res)=> {
     const result = new Promise((resolve, reject) => {
         if(req.query.user_id){
             const isFollowup = req.query.follow_up === "true"? true: false
-            connection.query(`select * from leads join customers on leads.customer_id=customers.customer_id where leads.user_id='${req.query.user_id}' ${req.query.name? `and lower(customers.customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.id? `and customers.cid=${req.query.id}`: ''} ${req.query.phone? `and customers.customer_phone like '%${req.query.phone}%'`: ''} and leads.follow_up=${isFollowup} ${isFollowup? ``: `${req.query.progress? `and customers.customer_progress='Not started'`: `and customers.customer_progress!='Not started'`}`} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
+            connection.query(`select * from leads join customers on leads.customer_id=customers.customer_id join users on leads.user_id=users.user_id where leads.user_id='${req.query.user_id}' ${req.query.name? `and lower(customers.customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.id? `and customers.cid=${req.query.id}`: ''} ${req.query.phone? `and customers.customer_phone like '%${req.query.phone}%'`: ''} and leads.follow_up=${isFollowup} ${isFollowup? ``: `${req.query.progress? `and customers.customer_progress='Not started'`: `and customers.customer_progress!='Not started'`}`} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
                 err? reject(): resolve(response.rows)
             })
         }
