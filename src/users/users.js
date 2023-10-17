@@ -235,7 +235,7 @@ router.get('/count', async (req, res)=> {
 router.get('/freshleads/count', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id&&req.query.branch_id){
-            connection.query(`select count(*) from customers where customer_progress='Not started' and assigned=false and dep_id=${req.query.dep_id} and branch_id=${req.query.branch_id};`, (err, response) => {
+            connection.query(`select count(*) from customers join users on customers.user_id=users.user_id where customers.customer_progress='Not started' and customers.assigned=false and customers.dep_id=${req.query.dep_id} and customers.branch_id=${req.query.branch_id} and users.user_type!='telecaller';`, (err, response) => {
                 if(err){
                     reject()
                 }
