@@ -65,7 +65,7 @@ router.get('/', (req, res)=> {
 })
 
 router.put('/', (req, res)=> {
-    const data = req.data
+    const data = req.body;
     const result = new Promise((resolve, reject)=> {
         if(data.room_id&&data.room_number&&data.room_building&&data.room_price){
             connection.query(`update rooms set room_building='${data.room_building}', room_number=${data.room_number}, room_price=${data.room_price} where room_id=${data.room_id};`, (err)=> {
@@ -91,6 +91,37 @@ router.put('/', (req, res)=> {
     .catch(()=> {
         res.status(500).json({
             result: 'room updation failed',
+            success: false
+        })
+    })
+})
+
+router.delete('/', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.room_id){
+            connection.query(`delete from rooms where room_id=${req.query.room_id};`, (err)=> {
+                if(err){
+                    reject()
+                }
+                else{
+                    resolve()
+                }
+            })
+        }
+        else{
+            reject()
+        }
+    })
+    
+    result.then(()=> {
+        res.status(200).json({
+            result: 'room delete success',
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'room delete failed',
             success: false
         })
     })

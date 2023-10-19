@@ -33,6 +33,38 @@ router.post('/', (req, res)=> {
     })
 })
 
+router.put('/', (req, res)=> {
+    const data = req.body
+    const result = new Promise((resolve, reject)=> {
+        if(data.vehicle_id&&data.vehicle_name){
+            connection.query(`update vehicles set vehicle_name='${data.vehicle_name}' where vehicle_id=${data.vehicle_id};`, (err)=> {
+                if(err){
+                    reject()
+                }
+                else{
+                    resolve()
+                }
+            })
+        }
+        else{
+            reject()
+        }
+    })
+    
+    result.then(()=> {
+        res.status(200).json({
+            result: 'vehicle updated successfully',
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'updating vehicle failed',
+            success: false
+        })
+    })
+})
+
 router.get('/', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.tour_id){
