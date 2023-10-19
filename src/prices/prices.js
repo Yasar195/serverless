@@ -56,6 +56,58 @@ router.post('/places', (req, res)=> {
     })
 })
 
+router.delete('/addons', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.price_id){
+            connection.query(`delete from addon_vehicle where price_id=${req.query.price_id};`, (err)=> {
+                err? reject(): resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: 'deleting addon vehicle price success',
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'deleting addon vehicle price failed',
+            success: true
+        })
+    })
+})
+
+router.delete('/places', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.price_id){
+            connection.query(`delete from place_vehicle where price_id=${req.query.price_id};`, (err)=> {
+                err? reject(): resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: 'deleting place vehicle price success',
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'deleting place vehicle price failed',
+            success: true
+        })
+    })
+})
+
 router.post('/addon/getprice', (req, res)=> {
     const data = req.body
     const result = new Promise((resolve, reject)=> {
