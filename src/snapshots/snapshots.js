@@ -3,10 +3,11 @@ const router = require('express').Router()
 
 router.post('/', (req, res)=> {
     const data = req.body
-    const dataString = JSON.stringify(data.data)
+    const str = String(data.tour_id)
+    const jsondata = JSON.stringify(data.data)
     const result = new Promise((resolve, reject)=> {
-        if(data.tour_id&&data.customer_id&&data.start_date&&data.end_date&&dataString){
-            connection.query(`insert into snapshots (tour_id, customer_id, start_date, end_date, day, night, adults, kids, infants, data) values ('${String(data.tour_id)}', ${data.customer_id}, '${data.start_date}', '${data.end_date}', ${data.day}, ${data.night}, ${data.adult}, ${data.kid}, ${data.infant}, '${dataString}');`, (err)=> {
+        if(data.tour_id.length>0&&data.customer_id&&data.start_date&&data.end_date){
+            connection.query(`insert into snapshots (tour_id, customer_id, start_date, end_date, day, night, adults, kids, infants, data) values ('${str}', ${data.customer_id}, '${data.start_date}', '${data.end_date}', ${data.day}, ${data.night}, ${data.adult}, ${data.kid}, ${data.infant}, '${jsondata}');`, (err)=> {
                 if(err){
                     reject()
                 }
