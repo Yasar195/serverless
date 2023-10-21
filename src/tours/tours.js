@@ -34,6 +34,54 @@ router.get('/', async (req, res)=> {
     })
 })
 
+router.put('/', (req, res)=> {
+    const data = req.body;
+    const key = `tours/${generateRandomString(10)}.pdf`
+
+    if(!(data.tour_id&&data.tour_name&&data.tour_code&&data.tour_des)){
+        return res.status(400).json({
+            result: "tour update failed",
+            success: false
+        })
+    }
+
+    const result = new Promise((resolve, reject) => {
+        if(req.files){
+            const file = req.files;
+            const params = {
+                Bucket: 'tele-profile',
+                Key: key,
+                Body: file.pdf.data,
+            };
+            s3.upload(params, function (err) {
+                if (err) {
+                    reject()
+                }
+                else{
+                    resolve()
+                }
+            })
+        }
+
+        connection.query(`update tour set tour_name='${data.tour_name}', tour_code='${data.tour_code}', tour_des='${data.tour_des}'${req.files? `, tour_pdf='${key}'`: ''} where tour_id=${data.tour_id};`, (err)=> {
+            err? reject(): resolve()
+        })
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: "updating tours success",
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "updating tours failed",
+            success: false
+        })
+    })
+})
+
 router.delete('/places', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.place_id){
