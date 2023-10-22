@@ -22,14 +22,12 @@ router.post('/', (req, res)=> {
                 }
                 else{
                     connection.query(`insert into proposals (customer_id, user_id, iti_key) values (${data.customer_id}, '${res.locals.uid}', '${key}');`, (err=> {
-                        console.log(err)
                         err? reject(): resolve();
                     }))
                 }
             });
         }
         else{
-            console.log('hello')
             reject()
         }
     })
@@ -41,7 +39,6 @@ router.post('/', (req, res)=> {
         })
     })
     .catch((err)=> {
-        console.log(err)
         res.status(500).json({
             result: "upload failed",
             success: false
