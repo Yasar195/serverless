@@ -28,6 +28,34 @@ router.post('/', (req, res)=> {
     })
 })
 
+router.post('/update', (req, res)=> {
+    const data = req.body;
+    const result = new Promise((resolve, reject)=> {
+        const cate = String(data.food_id)
+        if(data.food_id.length>0){
+            connection.query(`select * from food where (food_id IN (${cate}));`, (err, response)=> {
+                err? reject(): resolve(response.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'fetching food data failed',
+            success: false
+        })
+    })
+})
+
 router.get('/', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.tour_id){

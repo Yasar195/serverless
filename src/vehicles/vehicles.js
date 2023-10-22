@@ -33,6 +33,34 @@ router.post('/', (req, res)=> {
     })
 })
 
+router.post('/update', (req, res)=> {
+    const data = req.body;
+    const result = new Promise((resolve, reject)=> {
+        const cate = String(data.vehicle_id)
+        if(data.vehicle_id.length>0){
+            connection.query(`select * from vehicles join vehicle_cate on vehicles.vehicle_category=vehicle_cate.cat_id where (vehicles.vehicle_id IN (${cate}));`, (err, response)=> {
+                err? reject(): resolve(response.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'fetching vehicle data failed',
+            success: false
+        })
+    })
+})
+
 router.put('/', (req, res)=> {
     const data = req.body
     const result = new Promise((resolve, reject)=> {

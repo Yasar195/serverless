@@ -64,6 +64,34 @@ router.get('/', (req, res)=> {
     })
 })
 
+router.post('/update', (req, res)=> {
+    const data = req.body;
+    const result = new Promise((resolve, reject)=> {
+        const cate = String(data.room_id)
+        if(data.room_id.length>0){
+            connection.query(`select * from rooms join room_cate on rooms.room_category=room_cate.cat_id where (rooms.room_id IN (${cate}));`, (err, response)=> {
+                err? reject(): resolve(response.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'fetching room data failed',
+            success: false
+        })
+    })
+})
+
 router.put('/', (req, res)=> {
     const data = req.body;
     const result = new Promise((resolve, reject)=> {
