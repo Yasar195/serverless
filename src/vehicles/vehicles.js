@@ -33,7 +33,7 @@ router.post('/', (req, res)=> {
     })
 })
 
-router.post('/update', (req, res)=> {
+router.post('/fetch-vehicles', (req, res)=> {
     const data = req.body;
     const result = new Promise((resolve, reject)=> {
         const cate = String(data.vehicle_id)
