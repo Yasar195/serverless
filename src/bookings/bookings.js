@@ -283,7 +283,21 @@ router.get('/staff/tasks', (req, res)=> {
                     const idArray = []
                     response.rows.forEach((day)=> idArray.push(day.day_id))
                     connection.query(`select * from tasks where (day_id in (${String(idArray)}));`, (err, resp)=> {
-                        err? reject(): resolve(resp.rows)
+                        if(err){
+                            reject()
+                        }
+                        else{
+                            const groupedByDayId = resp.rows.reduce((result, item) => {
+                                const existingGroup = result.find((group) => group[0].day_id === item.day_id);
+                                if (existingGroup) {
+                                  existingGroup.push(item);
+                                } else {
+                                  result.push([item]);
+                                }
+                                return result;
+                            }, []);
+                            resolve(groupedByDayId)
+                        }
                     })
                 }
             })
