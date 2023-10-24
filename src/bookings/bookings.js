@@ -321,6 +321,33 @@ router.get('/staff/tasks', (req, res)=> {
     })
 })
 
+router.put('/staff/tasks', (req, res)=> {
+    const data = req.body;
+    const result = new Promise((resolve, reject)=> {
+        if(data.task_id&data.status){
+            connection.query(`update tasks set status=${data.status}${data.reason? `, reason=${data.reason}`: ''} where task_id=${data.task_id};`, (err)=> {
+                err? reject(): resolve()
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((data)=> {
+        res.status(200).json({
+            result: 'updating task success',
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(400).json({
+            result: "updating tasks failed",
+            success: false
+        })
+    })
+})
+
 router.get('/purchase', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id){
