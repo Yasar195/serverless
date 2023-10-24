@@ -282,7 +282,7 @@ router.get('/staff/tasks', (req, res)=> {
                 else{
                     const idArray = []
                     response.rows.forEach((day)=> idArray.push(day.day_id))
-                    connection.query(`select * from tasks where (day_id in (${String(idArray)}));`, (err, resp)=> {
+                    connection.query(`select * from tasks where (day_id in (${String(idArray)})) order by task_id;`, (err, resp)=> {
                         if(err){
                             reject()
                         }
