@@ -76,7 +76,7 @@ router.get('/', (req, res)=> {
 router.get('/customer', (req, res)=> {
     const upload = new Promise((resolve, reject)=> {
         if(req.query.customer_id){
-            connection.query(`select * from proposals join customers on proposals.customer_id=customers.customer_id where customers.customer_id=${req.query.customer_id} limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
+            connection.query(`select * from proposals join users on proposals.user_id=users.user_id where proposals.customer_id=${req.query.customer_id} order by proposals.prop_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
                 err? reject(): resolve(response.rows)
             })
         }
