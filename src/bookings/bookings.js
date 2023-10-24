@@ -323,9 +323,10 @@ router.get('/staff/tasks', (req, res)=> {
 
 router.put('/staff/tasks', (req, res)=> {
     const data = req.body;
+    console.log(data)
     const result = new Promise((resolve, reject)=> {
-        if(data.task_id&data.status){
-            connection.query(`update tasks set status=${data.status}${data.reason? `, reason=${data.reason}`: ''} where task_id=${data.task_id};`, (err)=> {
+        if(data.task_id&&data.status){
+            connection.query(`update tasks set status='${data.status}'${data.reason? `, reason='${data.reason}'`: ''} where task_id=${data.task_id};`, (err)=> {
                 err? reject(): resolve()
             })
         }
