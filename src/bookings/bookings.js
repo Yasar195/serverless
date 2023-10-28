@@ -21,38 +21,43 @@ router.post('/', (req, res)=> {
     };
     const data = JSON.parse(req.body.data)
     const result = new Promise((resolve, reject)=> {
-        if(data.customer_id&&data.amount_payable&&data.advance_amount&&data.tasks.length!=0&&data.bookables&&data.tour_id&&data.start_date&&data.end_date&&data.dep_id&&data.branch_id){
-            const string = String(data.bookables)
-            s3.upload(params, function (err) {
-                if (err) {
-                  reject()
-                }
-                else{
-                    connection.query(`insert into bookings (customer_id, user_id, amount_payable, advance_amount, bookables, tour_id, start_date, end_date, dep_id, branch_id, confirm_itinerary) values (${data.customer_id}, '${res.locals.uid}', ${data.amount_payable}, ${data.advance_amount}, '${string}', ${data.tour_id}, '${data.start_date}', '${data.end_date}', ${data.dep_id}, ${data.branch_id}, '${key}') returning booking_id;`, (err, response)=> {
-                        if(err){
-                            reject()
-                        }
-                        else{
-                            const booking_id = response.rows[0].booking_id;
-                            data.tasks.forEach((day)=> {
-                                connection.query(`insert into days(booking_id) values (${booking_id}) returning day_id;`, (err, dayres)=> {
-                                    if(err){
-                                        reject()
-                                    }
-                                    else{
-                                        const day_id = dayres.rows[0].day_id;
-                                        day.forEach(task=> {
-                                            connection.query(`insert into tasks (day_id, task) values (${day_id}, '${task}');`, (err)=> {
-                                                err? reject(): resolve()
+        if((data.advance_amount<=data.amount_payable)&&(data.advance_amount!=0&&data.amount_payable!=0)){
+            if(data.customer_id&&data.amount_payable&&data.advance_amount&&data.tasks.length!=0&&data.bookables&&data.tour_id&&data.start_date&&data.end_date&&data.dep_id&&data.branch_id){
+                const string = String(data.bookables)
+                s3.upload(params, function (err) {
+                    if (err) {
+                      reject()
+                    }
+                    else{
+                        connection.query(`insert into bookings (customer_id, user_id, amount_payable, advance_amount, bookables, tour_id, start_date, end_date, dep_id, branch_id, confirm_itinerary) values (${data.customer_id}, '${res.locals.uid}', ${data.amount_payable}, ${data.advance_amount}, '${string}', ${data.tour_id}, '${data.start_date}', '${data.end_date}', ${data.dep_id}, ${data.branch_id}, '${key}') returning booking_id;`, (err, response)=> {
+                            if(err){
+                                reject()
+                            }
+                            else{
+                                const booking_id = response.rows[0].booking_id;
+                                data.tasks.forEach((day)=> {
+                                    connection.query(`insert into days(booking_id) values (${booking_id}) returning day_id;`, (err, dayres)=> {
+                                        if(err){
+                                            reject()
+                                        }
+                                        else{
+                                            const day_id = dayres.rows[0].day_id;
+                                            day.forEach(task=> {
+                                                connection.query(`insert into tasks (day_id, task) values (${day_id}, '${task}');`, (err)=> {
+                                                    err? reject(): resolve()
+                                                })
                                             })
-                                        })
-                                    }
+                                        }
+                                    })
                                 })
-                            })
-                        }
-                    })
-                }
-            })
+                            }
+                        })
+                    }
+                })
+            }
+            else{
+                reject()
+            }
         }
         else{
             reject()
