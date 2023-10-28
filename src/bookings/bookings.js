@@ -501,7 +501,6 @@ router.get('/incomplete', (req, res)=> {
             const balance = parseInt(element.amount_payable) - parseInt(element.amount_paid)
             element.balance_amount = balance
         });
-        
         res.status(200).json({
             result: data,
             success: true
@@ -518,7 +517,7 @@ router.get('/incomplete', (req, res)=> {
 router.post('/sendnotification', (req, res)=> {
     const body = req.body;
     const result = new Promise((resolve, reject)=> {
-        if(body.booking_id&&body.message){
+        if(body.booking_id){
             connection.query(`update bookings set is_notif=true, messages='${body.message}' where booking_id=${body.booking_id};`, (err)=> {
                 err? reject(): resolve()
             })
