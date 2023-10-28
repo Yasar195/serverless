@@ -450,6 +450,18 @@ router.get('/notadvance', (req, res)=> {
     })
 
     result.then((data)=> {
+
+        data.forEach(element => {
+            if(element.confirm_itinerary){
+                const params = {
+                    Bucket: 'tele-profile',
+                    Key: element.confirm_itinerary,
+                };
+                const url = s3.getSignedUrl('getObject', params);
+                element.url = url
+            }
+        });
+
         res.status(200).json({
             result: data,
             success: true
@@ -476,10 +488,20 @@ router.get('/incomplete', (req, res)=> {
     })
 
     result.then((data)=> {
-        data.forEach((row)=> {
-            const balance = parseInt(row.amount_payable) - parseInt(row.amount_paid)
-            row.balance_amount = balance
-        })
+
+        data.forEach(element => {
+            if(element.confirm_itinerary){
+                const params = {
+                    Bucket: 'tele-profile',
+                    Key: element.confirm_itinerary,
+                };
+                const url = s3.getSignedUrl('getObject', params);
+                element.url = url
+            }
+            const balance = parseInt(element.amount_payable) - parseInt(element.amount_paid)
+            element.balance_amount = balance
+        });
+        
         res.status(200).json({
             result: data,
             success: true
