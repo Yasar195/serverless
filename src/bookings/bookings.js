@@ -440,7 +440,7 @@ router.put('/makecomplete', (req, res)=> {
 router.get('/notadvance', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id){
-            connection.query(`select bookings.booking_id, customers.customer_id, customers.cid, bookings.booking_date, customers.customer_name, bookings.advance_amount, bookings.amount_payable, tour.tour_name, users.user_name, tour.tour_code, bookings.start_date, bookings.end_date from bookings join customers on bookings.customer_id=customers.customer_id join tour on bookings.tour_id=tour.tour_id join users on bookings.user_id=users.user_id where bookings.dep_id=${req.query.dep_id} and advance_paid=false and bookings.payment_complete=false and bookings.is_notif=false order by booking_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
+            connection.query(`select * from bookings join customers on bookings.customer_id=customers.customer_id join tour on bookings.tour_id=tour.tour_id join users on bookings.user_id=users.user_id where bookings.dep_id=${req.query.dep_id} and advance_paid=false and bookings.payment_complete=false and bookings.is_notif=false order by booking_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
                 err? reject(): resolve(response.rows)
             })
         }
@@ -466,7 +466,7 @@ router.get('/notadvance', (req, res)=> {
 router.get('/incomplete', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id){
-            connection.query(`select bookings.booking_id, bookings.booking_date, customers.customer_name, customers.customer_id, customers.cid, bookings.start_date, bookings.end_date, bookings.amount_payable, bookings.amount_paid from bookings join customers on bookings.customer_id=customers.customer_id where bookings.dep_id=${req.query.dep_id} and bookings.advance_paid=true and bookings.is_notif=false and bookings.payment_complete=false order by booking_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};;`, (err, response)=> {
+            connection.query(`select * from bookings join customers on bookings.customer_id=customers.customer_id where bookings.dep_id=${req.query.dep_id} and bookings.advance_paid=true and bookings.is_notif=false and bookings.payment_complete=false order by booking_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};;`, (err, response)=> {
                 err? reject(): resolve(response.rows)
             })
         }
