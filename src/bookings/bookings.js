@@ -517,9 +517,16 @@ router.get('/incomplete', (req, res)=> {
 router.post('/sendnotification', (req, res)=> {
     const body = req.body;
     const result = new Promise((resolve, reject)=> {
-        if(body.booking_id){
-            connection.query(`update bookings set is_notif=true, messages='${body.message}' where booking_id=${body.booking_id};`, (err)=> {
-                err? reject(): resolve()
+        if(body.booking_id&&body.dep_id&&body.branch_id){
+            connection.query(`insert into transactions (dep_id, branch_id, booking_id) values(${body.dep_id}, ${body.branch_id}, ${body.booking_id});`, (err)=> {
+                if(err){
+                    reject()
+                }
+                else{
+                    connection.query(`update bookings set is_notif=true, messages='${body.message}' where booking_id=${body.booking_id};`, (err)=> {
+                        err? reject(): resolve()
+                    })    
+                }
             })
         }
         else{
