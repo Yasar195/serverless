@@ -516,9 +516,23 @@ router.get('/incomplete', (req, res)=> {
 
 router.post('/sendnotification', (req, res)=> {
     const body = req.body;
+    const key = `payslip/${generateRandomString(10)}.png`
     const result = new Promise((resolve, reject)=> {
+        if(req.files){
+            const file = req.files.pay;
+            const params = {
+                Bucket: 'tele-profile',
+                Key: key,
+                Body: file.data,
+            };
+            s3.upload(params, function (err) {
+                if (err) {
+                  reject()
+                }
+            })
+        }
         if(body.booking_id&&body.dep_id&&body.branch_id){
-            connection.query(`insert into transactions (dep_id, branch_id, booking_id) values(${body.dep_id}, ${body.branch_id}, ${body.booking_id});`, (err)=> {
+            connection.query(`insert into transactions (dep_id, branch_id, booking_id${req.files? `, payment_slip`: ''}) values(${body.dep_id}, ${body.branch_id}, ${body.booking_id}${req.files? `, '${key}'`: ''});`, (err)=> {
                 if(err){
                     reject()
                 }
@@ -540,7 +554,7 @@ router.post('/sendnotification', (req, res)=> {
             success: true
         })
     })
-    .catch(()=> {
+    .catch((err)=> {
         res.status(400).json({
             result: "notification send failed",
             success: false
@@ -577,8 +591,8 @@ router.get('/incomplete', (req, res)=> {
 router.put('/makepayments', (req, res)=> {
     const data = req.body;
     const result = new Promise((resolve, reject)=> {
-        if(data.booking_id&&data.amount&&data.branch_id, data.dep_id){
-            connection.query(`insert into transactions (booking_id, amount, dep_id, branch_id) values (${data.booking_id}, ${data.amount}, ${data.dep_id}, ${data.branch_id});`, (err)=> {
+        if(data.booking_id&&data.amount&&data.transaction_id){
+            connection.query(`update transactions set amount=${data.amount} where transaction_id=${data.transaction_id};`, (err)=> {
                 if(err){
                     reject()
                 }
@@ -621,7 +635,7 @@ router.put('/makepayments', (req, res)=> {
 router.get('/accounts/notifications', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id){
-            connection.query(`select bookings.booking_id, bookings.booking_date, customers.customer_name, bookings.advance_amount, bookings.amount_payable, bookings.amount_paid, users.user_name, bookings.start_date, bookings.messages, bookings.end_date from bookings join customers on bookings.customer_id=customers.customer_id join users on bookings.user_id=users.user_id where bookings.dep_id=${req.query.dep_id} and bookings.is_notif=true order by booking_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
+            connection.query(`select * from bookings join customers on bookings.customer_id=customers.customer_id join users on bookings.user_id=users.user_id where bookings.dep_id=${req.query.dep_id} and bookings.is_notif=true order by booking_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
                 err? reject(): resolve(response.rows)
             })
         }
@@ -631,10 +645,19 @@ router.get('/accounts/notifications', (req, res)=> {
     })
 
     result.then((data)=> {
-        data.forEach((row)=> {
-            const balance = parseInt(row.amount_payable) - parseInt(row.amount_paid)
-            row.balance_amount = balance
-        })
+        data.forEach(element => {
+            if(element.confirm_itinerary){
+                const params = {
+                    Bucket: 'tele-profile',
+                    Key: element.confirm_itinerary,
+                };
+                const url = s3.getSignedUrl('getObject', params);
+                element.url = url
+            }
+            const balance = parseInt(element.amount_payable) - parseInt(element.amount_paid)
+            element.balance_amount = balance
+        });
+
         res.status(200).json({
             result: data,
             success: true
@@ -643,6 +666,49 @@ router.get('/accounts/notifications', (req, res)=> {
     .catch(()=> {
         res.status(400).json({
             result: "fetching not advanced bookings failed",
+            success: false
+        })
+    })
+})
+
+router.get('/transactions', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.booking_id){
+            connection.query(`select * from transactions where booking_id=${req.query.booking_id} order by transaction_id desc;`, (err, response)=> {
+                if(err){
+                    reject()
+                }
+                else{
+                    resolve(response.rows)
+                }
+            })
+        }
+        else{
+            reject();
+        }
+    })
+
+    result.then((data)=> {
+
+        data.forEach(element => {
+            if(element.payment_slip){
+                const params = {
+                    Bucket: 'tele-profile',
+                    Key: element.payment_slip,
+                };
+                const url = s3.getSignedUrl('getObject', params);
+                element.url = url
+            }
+        });
+
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'fetching records failed',
             success: false
         })
     })
