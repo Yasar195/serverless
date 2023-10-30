@@ -19,12 +19,12 @@ router.post('/', (req, res)=> {
         Key: key,
         Body: file.data,
     };
-    console.log(req.body)
     const data = req.body
+    const json = JSON.parse(data.data)
     const result = new Promise((resolve, reject)=> {
-        if((data.advance_amount<=data.amount_payable)&&(data.advance_amount!=0&&data.amount_payable!=0)){
-            if(data.customer_id&&data.amount_payable&&data.advance_amount&&data.tasks.length!=0&&data.bookables&&data.tour_id&&data.start_date&&data.end_date&&data.dep_id&&data.branch_id){
-                const string = String(data.bookables)
+        if((parseInt(data.advance_amount)<=parseInt(data.amount_payable))&&(parseInt(data.advance_amount)!=0&&parseInt(data.amount_payable)!=0)){
+            if(data.customer_id&&data.amount_payable&&data.advance_amount&&json.tasks.length!=0&&json.bookables&&data.tour_id&&data.start_date&&data.end_date&&data.dep_id&&data.branch_id){
+                const string = String(json.bookables)
                 s3.upload(params, function (err) {
                     if (err) {
                       reject()
@@ -36,7 +36,7 @@ router.post('/', (req, res)=> {
                             }
                             else{
                                 const booking_id = response.rows[0].booking_id;
-                                data.tasks.forEach((day)=> {
+                                json.tasks.forEach((day)=> {
                                     connection.query(`insert into days(booking_id) values (${booking_id}) returning day_id;`, (err, dayres)=> {
                                         if(err){
                                             reject()
