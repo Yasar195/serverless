@@ -19,7 +19,8 @@ router.post('/', (req, res)=> {
         Key: key,
         Body: file.data,
     };
-    const data = JSON.parse(req.body.data)
+    console.log(req.body)
+    const data = req.body
     const result = new Promise((resolve, reject)=> {
         if((data.advance_amount<=data.amount_payable)&&(data.advance_amount!=0&&data.amount_payable!=0)){
             if(data.customer_id&&data.amount_payable&&data.advance_amount&&data.tasks.length!=0&&data.bookables&&data.tour_id&&data.start_date&&data.end_date&&data.dep_id&&data.branch_id){
