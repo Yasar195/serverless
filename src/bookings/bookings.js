@@ -29,7 +29,7 @@ router.post('/', (req, res)=> {
                       reject()
                     }
                     else{
-                        connection.query(`insert into bookings (customer_id, user_id, amount_payable, advance_amount, bookables, tour_id, start_date, end_date, dep_id, branch_id, confirm_itinerary) values (${data.customer_id}, '${res.locals.uid}', ${data.amount_payable}, ${data.advance_amount}, '${string}', ${data.tour_id}, '${data.start_date}', '${data.end_date}', ${data.dep_id}, ${data.branch_id}, '${key}') returning booking_id;`, (err, response)=> {
+                        connection.query(`insert into bookings (customer_id, user_id, amount_payable, advance_amount, bookables, tour_id, start_date, end_date, dep_id, branch_id, confirm_itinerary${data.adult? `, adult`: ''}${data.kid? `, kid`: ''}${data.infant? `, infant`: ''}) values (${data.customer_id}, '${res.locals.uid}', ${data.amount_payable}, ${data.advance_amount}, '${string}', ${data.tour_id}, '${data.start_date}', '${data.end_date}', ${data.dep_id}, ${data.branch_id}, '${key}'${data.adult? `, ${data.adult}`: ''}${data.kid? `, ${data.kid}`:''}${data.infant? `, ${data.infant}`:''}) returning booking_id;`, (err, response)=> {
                             if(err){
                                 reject()
                             }
@@ -599,14 +599,26 @@ router.put('/makepayments', (req, res)=> {
                 else{
                     const amount = parseInt(data.amount)
                     const points = Math.floor((amount*0.03)/20)
-                    connection.query(`update bookings set messages=null, is_notif=false, advance_paid=true, points=points+${points}, amount_paid=amount_paid+${parseInt(data.amount)} where booking_id=${data.booking_id} returning user_id;`, (err, resuser)=> {
+                    connection.query(`update bookings set messages=null, is_notif=false, advance_paid=true, points=points+${points}, amount_paid=amount_paid+${parseInt(data.amount)} where booking_id=${data.booking_id} returning user_id, amount_paid, amount_payable;`, (err, resuser)=> {
                         if(err){
                             reject()
                         }
                         else{
                             const user_id = resuser.rows[0].user_id
                             connection.query(`update users set points=points+${points} where user_id='${user_id}';`, (err)=> {
-                                err? reject(): resolve()
+                                if(err){
+                                    reject()
+                                }
+                                else{
+                                    if(parseInt(resuser.rows[0].amount_paid)===parseInt(resuser.rows[0].amount_payable)){
+                                        connection.query(`update bookings set payment_complete=true where booking_id=${data.booking_id};`, (err)=> {
+                                            err? reject(): resolve()
+                                        })
+                                    }
+                                    else{
+                                        resolve()
+                                    }
+                                }
                             })
                         }
                     })
