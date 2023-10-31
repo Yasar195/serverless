@@ -148,7 +148,7 @@ router.put('/', (req, res)=> {
 router.get('/', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id){
-            connection.query(`select bookings.booking_id, bookings.booking_date, customers.customer_name, bookings.amount_payable, bookings.amount_paid from bookings join customers on bookings.customer_id=customers.customer_id where bookings.dep_id=${req.query.dep_id} order by booking_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
+            connection.query(`select customers.cid, bookings.booking_id, bookings.booking_date, customers.customer_name, bookings.amount_payable, bookings.amount_paid from bookings join customers on bookings.customer_id=customers.customer_id where bookings.dep_id=${req.query.dep_id} order by booking_id desc limit 10 offset ${req.query.page? `${(parseInt(req.query.page) - 1)*10}`: '0'};`, (err, response)=> {
                 err? reject(): resolve(response.rows)
             })
         }
@@ -543,14 +543,22 @@ router.post('/sendnotification', (req, res)=> {
             })
         }
         if(body.booking_id&&body.dep_id&&body.branch_id){
-            connection.query(`insert into transactions (dep_id, branch_id, booking_id${req.files? `, payment_slip`: ''}) values(${body.dep_id}, ${body.branch_id}, ${body.booking_id}${req.files? `, '${key}'`: ''});`, (err)=> {
+            connection.query(`select user_name from users where user_id='${res.locals.uid}';`, (err, response)=> {
                 if(err){
                     reject()
                 }
                 else{
-                    connection.query(`update bookings set is_notif=true, messages='${body.message}' where booking_id=${body.booking_id};`, (err)=> {
-                        err? reject(): resolve()
-                    })    
+                    const user_name = response.rows[0].user_name
+                    connection.query(`insert into transactions (dep_id, branch_id, booking_id${req.files? `, payment_slip`: ''}) values(${body.dep_id}, ${body.branch_id}, ${body.booking_id}${req.files? `, '${key}'`: ''});`, (err)=> {
+                        if(err){
+                            reject()
+                        }
+                        else{
+                            connection.query(`update bookings set is_notif=true, messages='${body.message}', cashier='${user_name}' where booking_id=${body.booking_id};`, (err)=> {
+                                err? reject(): resolve()
+                            })    
+                        }
+                    })
                 }
             })
         }
