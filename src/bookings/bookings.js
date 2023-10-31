@@ -618,7 +618,7 @@ router.put('/makepayments', (req, res)=> {
                 else{
                     const amount = parseInt(data.amount)
                     const points = Math.floor((amount*0.03)/20)
-                    connection.query(`update bookings set messages=null, is_notif=false, advance_paid=true, points=points+${points}, amount_paid=amount_paid+${parseInt(data.amount)} where booking_id=${data.booking_id} returning user_id, amount_paid, amount_payable;`, (err, resuser)=> {
+                    connection.query(`update bookings set messages=null, is_notif=false, advance_paid=true, points=points+${points}, amount_paid=amount_paid+${parseInt(data.amount)}${data.date? `, payment_due='${data.date}'`:''} where booking_id=${data.booking_id} returning user_id, amount_paid, amount_payable;`, (err, resuser)=> {
                         if(err){
                             reject()
                         }
