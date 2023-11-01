@@ -125,7 +125,7 @@ router.get('/telecallers', (req, res)=> {
 router.get('/field', (req, res)=> {
     const user = new Promise((resolve, reject) => {
         if(req.query.dep_id){
-            connection.query(`select * from users where user_type='field staff' and dep_id=${req.query.dep_id};`, (err, result)=> {
+            connection.query(`select * from users where user_type='customer service' and dep_id=${req.query.dep_id};`, (err, result)=> {
                 err? reject(): resolve(result.rows)
             })
         }
