@@ -2,7 +2,6 @@ const connection = require('../utils/Connect')
 const router = require('express').Router()
 const { generateRandomString } = require('../utils/utils')
 const s3 = require('../utils/aws')
-const { ConnectParticipant } = require('aws-sdk')
 
 router.post('/', (req, res)=> {
     const key = `itineraries/${generateRandomString(10)}.pdf`
@@ -74,6 +73,44 @@ router.post('/', (req, res)=> {
     .catch(()=> {
         res.status(500).json({
             result: "bookings failed",
+            success: false
+        })
+    })
+})
+
+router.get('/payment/today', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.dep_id&&req.query.branch_id){
+            connection.query(`SELECT * FROM bookings join customers on bookings.customer_id=customers.customer_id join users on bookings.user_id=users.user_id WHERE bookings.payment_due::date = CURRENT_DATE and bookings.branch_id=${req.query.branch_id} and bookings.dep_id=${req.query.dep_id};`, (err, response)=> {
+                err? reject(): resolve(response.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((data)=> {
+
+        data.forEach(element => {
+            if(element.confirm_itinerary){
+                const params = {
+                    Bucket: 'tele-profile',
+                    Key: element.confirm_itinerary,
+                };
+                const url = s3.getSignedUrl('getObject', params);
+                element.url = url
+            }
+        });
+
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: 'fetching bookings failed',
             success: false
         })
     })
@@ -618,7 +655,7 @@ router.put('/makepayments', (req, res)=> {
                 else{
                     const amount = parseInt(data.amount)
                     const points = Math.floor((amount*0.03)/20)
-                    connection.query(`update bookings set messages=null, is_notif=false, advance_paid=true, points=points+${points}, amount_paid=amount_paid+${parseInt(data.amount)}${data.date? `, payment_due='${data.date}'`:''} where booking_id=${data.booking_id} returning user_id, amount_paid, amount_payable;`, (err, resuser)=> {
+                    connection.query(`update bookings set messages=null, is_notif=false, advance_paid=true, points=points+${points}, amount_paid=amount_paid+${parseInt(data.amount)}${data.date? `, payment_due='${data.date}'`:', payment_due=null'} where booking_id=${data.booking_id} returning user_id, amount_paid, amount_payable;`, (err, resuser)=> {
                         if(err){
                             reject()
                         }
