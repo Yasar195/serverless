@@ -182,6 +182,87 @@ router.put('/', (req, res)=> {
     })
 })
 
+    router.put('/purchase', (req, res)=> {
+        const data = req.body;
+        const result = new Promise((resolve, reject)=> {
+            if(data.booking_id&&data.booking_date&&data.customer_name&&data.reason&&data.amount_payable&&data.dep_id&&data.branch_id){
+                connection.query(`insert into cancelled (book_date, customer_name, amount, reason, dep_id, branch_id) values('${data.booking_date}', '${data.customer_name}', ${data.amount_payable}, '${data.reason}', ${data.dep_id}, ${data.branch_id});`, (err)=> {
+                    if(err){
+                        console.log(err)
+                        reject()
+                    }
+                    else{
+                        connection.query(`delete from transactions where booking_id=${data.booking_id};`, (err)=> {
+                            if(err){
+                                console.log(err)
+                                reject()
+                            }
+                            else{
+                                connection.query(`select day_id from days where booking_id=${data.booking_id};`, (err, resday)=> {
+                                    if(err){
+                                        console.log(err)
+                                        reject()
+                                    }
+                                    else{
+                                        resday.rows.forEach((day, index) => {
+                                            connection.query(`delete from tasks where day_id=${day.day_id};`, (err)=> {
+                                                if(err){
+                                                    console.log(err)
+                                                    reject()
+                                                }
+                                                else{
+                                                    if(index === resday.rows.length-1){
+                                                        connection.query(`delete from days where booking_id=${data.booking_id};`, (err)=> {
+                                                            if(err){
+                                                                console.log(err)
+                                                                reject()
+                                                            }
+                                                            else{
+                                                                connection.query(`delete from bookings where booking_id=${data.booking_id} returning points, user_id;`, (err, resid)=> {
+                                                                    if(err){
+                                                                        console.log(err)
+                                                                        reject()
+                                                                    }
+                                                                    else{
+                                                                        connection.query(`update users set points=points-${parseInt(resid.rows[0].points)} where user_id='${resid.rows[0].user_id}';`, (err)=> {
+                                                                            console.log(err)
+                                                                            err? reject(): resolve()
+                                                                        })
+                                                                    }
+                                                                })
+                                                            }
+                                                        })
+                                                    }
+                                                }
+                                            })
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+            }
+            else{
+                reject()
+            }
+        })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: "deletion success",
+            success: true
+        })
+    })
+    .catch((err)=> {
+        console.log(err)
+        res.status(500).json({
+            result: "deletion failed",
+            success: false
+        })
+    })
+})
+
 router.get('/', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id){
@@ -586,7 +667,7 @@ router.post('/sendnotification', (req, res)=> {
                 }
                 else{
                     const user_name = response.rows[0].user_name
-                    connection.query(`insert into transactions (dep_id, branch_id, booking_id${req.files? `, payment_slip`: ''}) values(${body.dep_id}, ${body.branch_id}, ${body.booking_id}${req.files? `, '${key}'`: ''});`, (err)=> {
+                    connection.query(`insert into transactions (dep_id, branch_id, booking_id, mode${req.files? `, payment_slip`: ''}) values(${body.dep_id}, ${body.branch_id}, ${body.booking_id}, '${body.mode}'${req.files? `, '${key}'`: ''});`, (err)=> {
                         if(err){
                             reject()
                         }
