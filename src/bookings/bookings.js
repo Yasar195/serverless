@@ -2,6 +2,7 @@ const connection = require('../utils/Connect')
 const router = require('express').Router()
 const { generateRandomString } = require('../utils/utils')
 const s3 = require('../utils/aws')
+const { refreshToken } = require('firebase-admin/app')
 
 router.post('/', (req, res)=> {
     const key = `itineraries/${generateRandomString(10)}.pdf`
@@ -742,6 +743,40 @@ router.get('/incomplete', (req, res)=> {
     .catch(()=> {
         res.status(400).json({
             result: "fetching incomplete bookings failed",
+            success: false
+        })
+    })
+})
+
+router.put('/paymentnotrecieved', (req, res)=> {
+    const data = req.body;
+    const result = new Promise((resolve, reject)=> {
+        if(data.transaction_id&&data.booking_id){
+            connection.query(`delete from transactions where transaction_id=${data.transaction_id};`, (err)=> {
+                if(err){
+                    reject()
+                }
+                else{
+                    connection.query(`update bookings set is_notif=false, messages=null where booking_id=${data.booking_id};`, (err)=> {
+                        err? reject(): resolve()
+                    })
+                }
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: 'bookings updated',
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(400).json({
+            result: "bookings not updated",
             success: false
         })
     })
