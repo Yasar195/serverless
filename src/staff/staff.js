@@ -102,4 +102,35 @@ router.put('/suspend', (req, res)=> {
     })
 })
 
+router.put('/revoke', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.user_id){
+            connection.query(`update users set registered=true where user_id='${req.query.user_id}';`, (err)=> {
+                if(err){
+                    reject()
+                }
+                else{
+                    resolve()
+                }
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then(()=> {
+        res.status(200).json({
+            result: "suspension revoke success",
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "suspension revoke failed",
+            success: false
+        })
+    })
+})
+
 module.exports = router
