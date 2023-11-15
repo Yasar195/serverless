@@ -230,6 +230,84 @@ router.get('/individual', (req, res)=> {
     })
 })
 
+router.get('/individual/freshlead/count', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.user_id){
+            connection.query(`select count(*) from leads join customers on leads.customer_id=customers.customer_id where customers.customer_progress='Not started' and leads.user_id='${req.query.user_id}' and leads.follow_up=false;`, (err, response)=> {
+                err? reject(): resolve(response.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "fetching fresh lead count failed",
+            success: false
+        })
+    })
+})
+
+router.get('/individual/oldlead/count', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.user_id){
+            connection.query(`select count(*) from leads join customers on leads.customer_id=customers.customer_id where customers.customer_progress!='Not started' and leads.user_id='${req.query.user_id}' and leads.follow_up=false;`, (err, response)=> {
+                err? reject(): resolve(response.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "fetching old lead count failed",
+            success: false
+        })
+    })
+})
+
+router.get('/individual/follow/count', (req, res)=> {
+    const result = new Promise((resolve, reject)=> {
+        if(req.query.user_id){
+            connection.query(`select count(*) from leads join customers on leads.customer_id=customers.customer_id where leads.user_id='${req.query.user_id}' and leads.follow_up=true;`, (err, response)=> {
+                err? reject(): resolve(response.rows)
+            })
+        }
+        else{
+            reject()
+        }
+    })
+
+    result.then((data)=> {
+        res.status(200).json({
+            result: data,
+            success: true
+        })
+    })
+    .catch(()=> {
+        res.status(500).json({
+            result: "fetching follow lead count failed",
+            success: false
+        })
+    })
+})
+
 router.put('/individual', (req, res)=> {
     const data = req.body;
     const result = new Promise((resolve, reject) => {
