@@ -23,6 +23,7 @@
     "express-fileupload": "^1.4.0",
     "firebase-admin": "^11.7.0",
     "fs": "^0.0.1-security",
+    "pdfkit": "^0.14.0",
     "pg": "^8.10.0",
     "serverless-http": "^3.2.0"
   }

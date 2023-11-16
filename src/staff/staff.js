@@ -1,6 +1,7 @@
 const connection = require('../utils/Connect')
 const router = require('express').Router()
 const s3 = require('../utils/aws')
+const { createPDF } = require('../utils/utils')
 
 router.get('/', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
@@ -203,10 +204,9 @@ router.get('/analytics', (req, res)=> {
     })
 
     result.then((data) => {
-        res.status(200).json({
-            result: data,
-            success: true
-        })
+        res.contentType('application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename="generated.pdf"');
+        createPDF(data, res)
     })
     .catch(()=> {
         res.status(500).json({
