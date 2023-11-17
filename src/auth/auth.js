@@ -99,7 +99,7 @@ router.get('/admins', async (req, res)=> {
 router.get('/telecallers', (req, res)=> {
     const user = new Promise((resolve, reject) => {
         if(req.query.dep_id&&req.query.branch_id){
-            connection.query(`select * from users where user_type='telecaller' and dep_id=${req.query.dep_id} and branch_id=${req.query.branch_id};`, (err, result)=> {
+            connection.query(`select * from users where user_type='telecaller' and registered=true and dep_id=${req.query.dep_id} and branch_id=${req.query.branch_id};`, (err, result)=> {
                 err? reject(): resolve(result.rows)
             })
         }
