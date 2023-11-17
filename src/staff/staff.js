@@ -48,7 +48,7 @@ router.get('/', async (req, res)=> {
 
 router.get('/all', (req, res)=> {
     const result = new Promise((resolve, reject)=> {
-        connection.query(`select * from users;`, (err, result)=> {
+        connection.query(`select * from users join departments on users.dep_id=departments.dep_id;`, (err, result)=> {
             if(err){
                 reject()
             }
