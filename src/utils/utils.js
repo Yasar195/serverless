@@ -48,9 +48,16 @@ const createPDF = (fetdata, res) => {
             const y = rowIndex * 30 + cellPadding;
 
             doc.text(cell.toString(), x, y);
+            if (doc.y > doc.page.height - 100) {
+              // If close to the bottom, start a new page
+              console.log('new')
+              doc.addPage();
+            }
         });
     });
   }
+
+  console.log(userId)
 
   userId.forEach((tele, index)=> {
     const data = [
@@ -63,7 +70,7 @@ const createPDF = (fetdata, res) => {
         data.push(temp)
       }
     })
-    console.log(data)
+    // console.log(data)
     createTable(data)
     doc.addPage();
     if(unique.length-1===index){
