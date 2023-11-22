@@ -154,9 +154,13 @@ router.get('/analytics', (req, res)=> {
     })
 
     result.then((data) => {
-        res.contentType('application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename="generated.pdf"');
-        createPDF(data, res)
+        // res.contentType('application/pdf');
+        // res.setHeader('Content-Disposition', 'attachment; filename="generated.pdf"');
+        // createPDF(data, res)
+        res.status(200).json({
+            result: data,
+            success: true
+        })
     })
     .catch(()=> {
         res.status(500).json({
