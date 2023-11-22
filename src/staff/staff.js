@@ -136,65 +136,15 @@ router.put('/revoke', (req, res)=> {
 
 
 router.get('/analytics', (req, res)=> {
-    const resjson={}
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id&&req.query.branch_id){
-            connection.query(`select count(*) from customers where created=current_date and dep_id=${req.query.dep_id} and branch_id=${req.query.branch_id};`, (err, result)=> {
+            connection.query(`select * from customer_response join users on customer_response.user_id=users.user_id join customers on customer_response.customer_id=customers.customer_id where customer_response.call_date::date=current_date;`, (err, result)=> {
                 if(err){
+                    console.log(err)
                     reject()
                 }
                 else{
-                    resjson.leads_created=result.rows[0].count
-                    connection.query(`select count(*) from bookings where booking_date=current_date and dep_id=${req.query.dep_id} and branch_id=${req.query.branch_id};`, (err, result)=> {
-                        if(err){
-                            console.log(err)
-                            reject()
-                        }
-                        else{
-                            resjson.bookings_created=result.rows[0].count
-                            connection.query(`select user_id, user_name from users where user_type='telecaller' and dep_id=${req.query.dep_id} and branch_id=${req.query.branch_id};`, (err, result)=> {
-                                if(err){
-                                    reject()
-                                }
-                                else{
-                                    resjson.telecallers = []
-                                    result.rows.map((user, index)=> {
-                                        const obj = {
-                                            name: user.user_name
-                                        }
-                                        connection.query(`select count(*) from leads where user_id='${user.user_id}' and created_at::date=current_date`, (err, resulte)=> {
-                                            if(err){
-                                                reject()
-                                            }
-                                            else{
-                                                obj.assigned = resulte.rows[0].count
-                                                connection.query(`select count(*) from customer_response where user_id='${user.user_id}' and call_date=current_date`, (err, rescal)=> {
-                                                    if(err){
-                                                        reject()
-                                                    }
-                                                    else{
-                                                        obj.calls = rescal.rows[0].count
-                                                        connection.query(`select count(*) from bookings where booking_date::date=current_date and user_id='${user.user_id}';`, (err, resbook)=> {
-                                                            if(err){
-                                                                reject()
-                                                            }
-                                                            else{
-                                                                obj.bookings = resbook.rows[0].count
-                                                                resjson.telecallers.push(obj)
-                                                                if(result.rows.length-1===index){
-                                                                    resolve(resjson)
-                                                                }
-                                                            }
-                                                        })
-                                                    }
-                                                })
-                                            }
-                                        })
-                                    })
-                                }
-                            })
-                        }
-                    })
+                    resolve(result.rows)
                 }
             })
         }

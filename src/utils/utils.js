@@ -22,32 +22,54 @@ function getDateTime(){
   return data
 }
 
-const createPDF = (data, res) => {
+const createPDF = (fetdata, res) => {
   const pdfFileName = 'output.pdf';
   const doc = new PDFDocument();
   const stream = fs.createWriteStream(pdfFileName);
 
   doc.pipe(res);
 
-  // Add content to the PDF
-  doc.fontSize(10).text('Lead and Telecaller Report', { align: 'center' });
+  function getUniqueValues(arr, prop) {
+    return arr.filter((obj, index, self) =>
+      index === self.findIndex((o) => o[prop] === obj[prop])
+    );
+  }
 
-  doc.text(`Date generated: ${new Date().toLocaleDateString()}`)
-  doc.text(`Total fresh leads: ${data.leads_created}`);
-  doc.text(`Total bookings: ${data.bookings_created}`);
+  const unique = getUniqueValues(fetdata, 'user_id')
+  const userId = []
+  unique.forEach((obj)=> userId.push({'telecaller_name': obj.user_name, 'id': obj.user_id}))
 
+  function createTable(data, options = {}) {
+    const cellPadding = options.cellPadding || 10;
 
-  // Loop through telecallers
-  data.telecallers.forEach((telecaller, index) => {
-      doc.moveDown();
-      doc.text(`Name: ${telecaller.name}`);
-      doc.text(`Assigned: ${telecaller.assigned}`);
-      doc.text(`Calls: ${telecaller.calls}`);
-      doc.text(`Bookings: ${telecaller.bookings}`);
-  });
+    data.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+            const x = colIndex * 92 + cellPadding;
+            const y = rowIndex * 30 + cellPadding;
 
-  // Finalize the PDF
-  doc.end();
+            doc.text(cell.toString(), x, y);
+        });
+    });
+  }
+
+  userId.forEach((tele, index)=> {
+    const data = [
+      ['telecaller', 'CID', 'Customer name', 'Progress', "follow up", "phone"]
+    ];
+    fetdata.forEach((info)=> {
+      const temp = [info.user_name, info.cid, info.customer_name, info.customer_progress, info.assigned, info.customer_phone]
+      // console.log(info.user_id, tele)
+      if(info.user_id===tele.id){
+        data.push(temp)
+      }
+    })
+    console.log(data)
+    createTable(data)
+    doc.addPage();
+    if(unique.length-1===index){
+      doc.end();
+    }
+  })
 }
 
 module.exports = {
