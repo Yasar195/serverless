@@ -204,7 +204,7 @@ router.get('/freshleads', async (req, res)=> {
 router.get('/count', async (req, res)=> {
     const result = new Promise((resolve, reject)=> {
         if(req.query.dep_id&&req.query.branch_id){
-            connection.query(`select count(*) from customers where dep_id=${req.query.dep_id} and branch_id=${req.query.branch_id};`, (err, response) => {
+            connection.query(`SELECT count(*) FROM customers JOIN users ON customers.user_id = users.user_id JOIN departments ON customers.dep_id = departments.dep_id JOIN dep_branch ON customers.branch_id = dep_branch.id join branches on dep_branch.branch_id=branches.branch_id where customers.dep_id=${req.query.dep_id} and customers.branch_id=${req.query.branch_id} ${req.query.name? `and lower(customer_name) like lower('%${req.query.name}%')`: ''} ${req.query.date? `and customers.created='${req.query.date}'`: ''} ${req.query.tour? `and customers.tour='${req.query.tour}'`: ''} ${req.query.progress? `and customer_progress='${req.query.progress}'`: ''} ${req.query.user_id? `and customers.user_id like '%${req.query.user_id}%'`: ''} ${req.query.id? `and customers.cid=${req.query.id} or customers.cid=${req.query.id}`: ''} ${req.query.phone? `and customer_phone like '%${req.query.phone}%'`: ''};`, (err, response) => {
                 if(err){
                     reject()
                 }
