@@ -18,13 +18,13 @@ const authenticate = async (req, res, next) => {
     })
 
     auth.then((usercred)=> {
-        res.locals.uid = usercred.uid
-        res.locals.email = usercred.email
-        next()
-        // res.status(503).json({
-        //     result: "Service is temporarily suspended",
-        //     success: false
-        // })
+        // res.locals.uid = usercred.uid
+        // res.locals.email = usercred.email
+        // next()
+        res.status(503).json({
+            result: "Service is temporarily suspended",
+            success: false
+        })
     })
     .catch(()=> {
         res.status(403).json({
